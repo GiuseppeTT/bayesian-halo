@@ -26,3 +26,113 @@ count_time_from_zero <- function(
 ) {
     return(start_time - times)
 }
+
+plot_observed_scores <- function(
+    scores
+) {
+    plot <-
+        scores %>%
+        ggplot(aes(x = time, y = score, color = team)) +
+        geom_step(size = 2) +
+        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time (minutes)",
+            y = "Score",
+            color = "Team"
+        )
+
+    return(plot)
+}
+
+plot_observed_ttp_distribution <- function(
+    scores
+) {
+    plot <-
+        scores %>%
+        ggplot(aes(x = ttp, color = team)) +
+        geom_density(size = 2) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time to point (minutes)",
+            y = "Density",
+            color = "Team"
+        )
+
+    return(plot)
+}
+
+plot_observed_ttp_vs_time <- function(
+    scores
+) {
+    plot <-
+        scores %>%
+        rename(Team = team) %>%
+        ggplot(aes(x = time, y = ttp)) +
+        geom_col() +
+        geom_smooth(size = 2) +
+        facet_grid(cols = vars(Team), labeller = label_both) +
+        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time (minutes)",
+            y = "Time to point (minutes)"
+        )
+
+    return(plot)
+}
+
+plot_drawn_scores <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(x = time, y = score, group = .draw)) +
+        geom_step(alpha = 0.1) +
+        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time (minutes)",
+            y = "Score",
+            color = "Team"
+        )
+
+    return(plot)
+}
+
+plot_drawn_ttp_distribution <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(x = ttp, group = .draw)) +
+        geom_density(color = alpha("black", 0.1)) +
+        scale_x_log10() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time to point (minutes)",
+            y = "Density"
+        )
+
+    return(plot)
+}
+
+plot_drawn_ttp_vs_time <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(x = time, y = ttp, group = .draw)) +
+        geom_smooth(se = FALSE, color = alpha("black", 0.1)) +
+        coord_cartesian(xlim = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        scale_y_log10() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time (minutes)",
+            y = "Time to point (minutes)"
+        )
+
+    return(plot)
+}
