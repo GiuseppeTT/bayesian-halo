@@ -9,16 +9,9 @@ source("R/functions.R")
 
 ################################################################################
 # Read data
-column_types <- cols(
-    game = col_double(),
-    time = col_time(format = "%M:%S:00"),
-    blue = col_double(),
-    red = col_double()
-)
-
 scores <- read_csv(
     RAW_SCORES_PATH,
-    col_types = column_types
+    col_types = RAW_SCORES_COLUMN_TYPES
 )
 
 ################################################################################
