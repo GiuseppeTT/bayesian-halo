@@ -1,6 +1,7 @@
 ################################################################################
 # Load libraries
 library(tidyverse)
+library(arrow)
 
 ################################################################################
 # Source auxiliary files
@@ -9,10 +10,7 @@ source("R/functions.R")
 
 ################################################################################
 # Read data
-scores <- read_csv(
-    CLEAN_SCORES_PATH,
-    col_types = CLEAN_SCORES_COLUMN_TYPES
-)
+scores <- read_feather(CLEAN_SCORES_PATH)
 
 ################################################################################
 # Analyze data

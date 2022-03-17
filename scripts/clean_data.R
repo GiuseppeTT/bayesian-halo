@@ -1,6 +1,7 @@
 ################################################################################
 # Load libraries
 library(tidyverse)
+library(arrow)
 
 ################################################################################
 # Source auxiliary files
@@ -28,7 +29,9 @@ scores <-
 
 scores <-
     scores %>%
-    mutate(team = str_to_sentence(team))
+    mutate(team = str_to_sentence(team)) %>%
+    mutate(team = factor(team)) %>%
+    mutate(team = fct_relevel(team, "Blue", "Red"))
 
 scores <-
     scores %>%
@@ -47,4 +50,4 @@ scores <-
 ################################################################################
 # Write data
 scores %>%
-    write_csv(CLEAN_SCORES_PATH)
+    write_feather(CLEAN_SCORES_PATH)
