@@ -9,7 +9,10 @@ source("R/functions.R")
 
 ################################################################################
 # Read data
-scores <- read_csv(CLEAN_SCORES_PATH)
+scores <- read_csv(
+    CLEAN_SCORES_PATH,
+    col_types = CLEAN_SCORES_COLUMN_TYPES
+)
 
 ################################################################################
 # Analyze data
