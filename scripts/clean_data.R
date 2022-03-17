@@ -33,7 +33,7 @@ scores <-
 scores <-
     scores %>%
     group_by(game, team) %>%
-    arrange(time) %>%
+    arrange(time, .by_group = TRUE) %>%
     filter(has_changed(score, keep_first = TRUE)) %>%
     ungroup()
 
