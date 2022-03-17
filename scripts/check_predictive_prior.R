@@ -33,9 +33,8 @@ prior_model_fit <- prior_model$sample(
 
 prior_model_draws <-
     prior_model_fit %>%
-    spread_draws(rate, ttps[score]) %>%
-    ungroup() %>%
-    rename(ttp = ttps)
+    spread_draws(rate, ttp[score]) %>%
+    ungroup()
 
 prior_model_draws <-
     prior_model_draws %>%

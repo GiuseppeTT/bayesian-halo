@@ -7,7 +7,7 @@ generated quantities {
 
     real<lower = 0> rate = exponential_rng(rate_of_rates);
 
-    array[max_score] real<lower = 0> ttps;
+    array[max_score] real<lower = 0> ttp;
     for (t in 1:max_score)
-        ttps[t] = exponential_rng(rate);
+        ttp[t] = exponential_rng(rate);
 }
