@@ -83,6 +83,23 @@ plot_observed_ttp_vs_time <- function(
     return(plot)
 }
 
+plot_drawn_prior_rate <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(x = "Rate", y = rate)) +
+        stat_pointinterval() +
+        coord_flip() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = NULL,
+            y = "Rate"
+        )
+
+    return(plot)
+}
+
 plot_drawn_scores <- function(
     draws
 ) {

@@ -57,6 +57,9 @@ prior_model_draws %>%
     median_hdci(ttp)
 
 prior_model_draws %>%
+    plot_drawn_prior_rate()
+
+prior_model_draws %>%
     plot_drawn_scores()
 
 prior_model_draws %>%
