@@ -11,15 +11,15 @@ source("R/functions.R")
 
 ################################################################################
 # Fit prior model
+prior_data <- list(
+    max_score = GAME_MAX_SCORE,
+    mean_rate_of_rates = GAME_MAX_SCORE / GAME_MAX_DURATION
+)
+
 prior_model <- cmdstan_model(
     PRIOR_MODEL_PATH,
     dir = "stan",
     pedantic = TRUE
-)
-
-prior_data <- list(
-    max_score = GAME_MAX_SCORE,
-    mean_rate_of_rates = GAME_MAX_SCORE / GAME_MAX_DURATION
 )
 
 prior_model_fit <- prior_model$sample(
@@ -31,38 +31,28 @@ prior_model_fit <- prior_model$sample(
     fixed_param = TRUE
 )
 
-prior_model_draws <-
-    prior_model_fit %>%
-    spread_draws(rate, ttp[score]) %>%
-    ungroup()
-
-prior_model_draws <-
-    prior_model_draws %>%
-    group_by(.draw) %>%
-    mutate(time = cumsum(ttp)) %>%
-    ungroup()
-
-prior_model_draws <-
-    prior_model_draws %>%
-    select(.chain, .iteration, .draw, rate, time, score, ttp)
-
 ################################################################################
 # Check predictive prior
-prior_model_draws %>%
+prior_model_fit %>%
+    spread_draws(rate) %>%
     median_hdci(rate)
 
-prior_model_draws %>%
-    group_by(score) %>%
+prior_model_fit %>%
+    spread_draws(ttp[t]) %>%
     median_hdci(ttp)
 
-prior_model_draws %>%
+prior_model_fit %>%
+    spread_draws(rate) %>%
     plot_drawn_prior_rate()
 
-prior_model_draws %>%
+prior_model_fit %>%
+    spread_draws(time[t], score[t]) %>%
     plot_drawn_scores()
 
-prior_model_draws %>%
+prior_model_fit %>%
+    spread_draws(ttp[t]) %>%
     plot_drawn_ttp_distribution()
 
-prior_model_draws %>%
+prior_model_fit %>%
+    spread_draws(time[t], ttp[t]) %>%
     plot_drawn_ttp_vs_time()
