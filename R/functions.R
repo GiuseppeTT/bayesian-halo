@@ -245,6 +245,7 @@ plot_posterior_ttp_distribution <- function(
         ggplot(aes(x = predicted_ttp, color = team, group = str_c(.draw, team))) +
         stat_density(geom = "line", position = "identity", alpha = 0.1) +
         scale_x_log10() +
+        scale_color_viridis_d() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Time to point (minutes)",
