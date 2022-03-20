@@ -32,7 +32,7 @@ prior_model_fit <- prior_model$sample(
 )
 
 ################################################################################
-# Check predictive prior
+# Check prior model
 prior_model_fit %>%
     spread_draws(rate) %>%
     median_hdci(rate)
@@ -45,6 +45,8 @@ prior_model_fit %>%
     spread_draws(rate) %>%
     plot_drawn_prior_rate()
 
+################################################################################
+# Check predictive prior
 prior_model_fit %>%
     spread_draws(time[t], score[t]) %>%
     plot_drawn_scores()

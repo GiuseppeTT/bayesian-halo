@@ -2,7 +2,7 @@
 # Define constants
 RAW_SCORES_PATH <- "data/raw/scores.csv"
 CLEAN_SCORES_PATH <- "data/clean/scores.feather"
-PRIOR_MODEL_PATH <- "models/prior-model.stan"
+PRIOR_MODEL_PATH <- "models/prior_model.stan"
 MODEL_PATH <- "models/model.stan"
 
 RAW_SCORES_COLUMN_TYPES <- cols(
