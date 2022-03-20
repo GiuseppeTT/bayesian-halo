@@ -91,7 +91,7 @@ plot_prior_rate <- function(
     plot <-
         draws %>%
         ggplot(aes(x = "Rate", y = rate)) +
-        stat_pointinterval() +
+        stat_pointinterval(point_interval = "median_hdci") +
         coord_flip() +
         theme_minimal(FONT_SIZE) +
         labs(
@@ -180,7 +180,7 @@ plot_posterior_rates <- function(
     plot <-
         draws %>%
         ggplot(aes(x = team, y = rate)) +
-        stat_pointinterval() +
+        stat_pointinterval(point_interval = "median_hdci") +
         scale_y_continuous(limits = c(0, NA)) +
         coord_flip() +
         theme_minimal(FONT_SIZE) +
@@ -198,7 +198,7 @@ plot_posterior_contrast <- function(
     plot <-
         draws %>%
         ggplot(aes(x = "Rate contrast", y = rate_contrast)) +
-        stat_pointinterval() +
+        stat_pointinterval(point_interval = "median_hdci") +
         geom_hline(yintercept = 0, color = "red", size = 2) +
         coord_flip() +
         theme_minimal(FONT_SIZE) +
