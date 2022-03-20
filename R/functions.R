@@ -155,3 +155,120 @@ plot_prior_ttp_vs_time <- function(
 
     return(plot)
 }
+
+recover_covariates <- function(
+    draws,
+    data,
+    by,
+    ...
+) {
+    data <-
+        data %>%
+        mutate("{by}" := row_number()) %>%
+        select(.data[[by]], ...)
+
+    draws <-
+        draws %>%
+        left_join(data, by = by)
+
+    return(draws)
+}
+
+plot_posterior_rates <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(x = team, y = rate)) +
+        stat_pointinterval() +
+        scale_y_continuous(limits = c(0, NA)) +
+        coord_flip() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Team",
+            y = "Rate"
+        )
+
+    return(plot)
+}
+
+plot_posterior_contrast <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(x = "Rate contrast", y = rate_contrast)) +
+        stat_pointinterval() +
+        geom_hline(yintercept = 0, color = "red", size = 2) +
+        coord_flip() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = NULL,
+            y = "Rate"
+        )
+
+    return(plot)
+}
+
+plot_posterior_scores <- function(
+    draws,
+    scores
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(
+            x = predicted_time,
+            y = predicted_score,
+            color = team,
+            group = str_c(.draw, team)
+        )) +
+        geom_step(alpha = 0.01) +
+        geom_step(aes(x = time, y = score, color = team, group = NULL), data = scores, size = 2) +
+        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
+        scale_color_viridis_d() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time (minutes)",
+            y = "Score",
+            color = "Team"
+        )
+
+    return(plot)
+}
+
+plot_posterior_ttp_distribution <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        ggplot(aes(x = predicted_ttp, color = team, group = str_c(.draw, team))) +
+        stat_density(geom = "line", position = "identity", alpha = 0.1) +
+        scale_x_log10() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time to point (minutes)",
+            y = "Density"
+        )
+
+    return(plot)
+}
+
+plot_posterior_ttp_vs_time <- function(
+    draws
+) {
+    plot <-
+        draws %>%
+        rename(Team = team) %>%
+        ggplot(aes(x = predicted_time, y = predicted_ttp, group = str_c(.draw, Team))) +
+        geom_smooth(se = FALSE, color = alpha("black", 0.1)) +
+        facet_grid(cols = vars(Team), labeller = label_both) +
+        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time (minutes)",
+            y = "Time to point (minutes)"
+        )
+
+    return(plot)
+}
