@@ -18,7 +18,7 @@ prior_data <- list(
 
 prior_model <- cmdstan_model(
     PRIOR_MODEL_PATH,
-    dir = "stan",
+    dir = COMPILED_MODEL_PATH,
     pedantic = TRUE
 )
 

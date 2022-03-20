@@ -2,8 +2,9 @@
 # Define constants
 RAW_SCORES_PATH <- "data/raw/scores.csv"
 CLEAN_SCORES_PATH <- "data/clean/scores.feather"
-PRIOR_MODEL_PATH <- "models/prior_model.stan"
-MODEL_PATH <- "models/model.stan"
+COMPILED_MODEL_PATH <- "models"
+PRIOR_MODEL_PATH <- "stan/prior_model.stan"
+MODEL_PATH <- "stan/model.stan"
 
 RAW_SCORES_COLUMN_TYPES <- cols(
     game = col_double(),

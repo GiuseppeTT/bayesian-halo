@@ -14,12 +14,15 @@ source("R/functions.R")
 # Read data
 scores <- read_feather(CLEAN_SCORES_PATH)
 
+scores <-
+    scores %>%
+    filter(game == 1)  # TODO: generalize for more than one game
+
 ################################################################################
 # Fit model
 model_data <-
     scores %>%
-    filter(game == 1) %>%  # TODO: generalize for more than one game
-    select(team, time)
+    select(team, time) %>%
     compose_data(.n_name = function(name) ifelse(name == "", "sample_size", str_glue("{name}_count")))
 
 model_data <- c(
@@ -29,7 +32,7 @@ model_data <- c(
 
 model <- cmdstan_model(
     MODEL_PATH,
-    dir = "stan",
+    dir = COMPILED_MODEL_PATH,
     pedantic = TRUE
 )
 
