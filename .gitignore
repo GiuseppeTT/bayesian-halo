@@ -1,3 +1,5 @@
+################################################################################
+# Added by GitHub R template
 # History files
 .Rhistory
 .Rapp.history
@@ -37,3 +39,8 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+################################################################################
+# Added manually
+# Plot files
+Rplots.pdf
