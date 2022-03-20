@@ -85,7 +85,7 @@ plot_observed_ttp_vs_time <- function(
     return(plot)
 }
 
-plot_drawn_prior_rate <- function(
+plot_prior_rate <- function(
     draws
 ) {
     plot <-
@@ -102,7 +102,7 @@ plot_drawn_prior_rate <- function(
     return(plot)
 }
 
-plot_drawn_scores <- function(
+plot_prior_scores <- function(
     draws
 ) {
     plot <-
@@ -121,7 +121,7 @@ plot_drawn_scores <- function(
     return(plot)
 }
 
-plot_drawn_ttp_distribution <- function(
+plot_prior_ttp_distribution <- function(
     draws
 ) {
     plot <-
@@ -138,7 +138,7 @@ plot_drawn_ttp_distribution <- function(
     return(plot)
 }
 
-plot_drawn_ttp_vs_time <- function(
+plot_prior_ttp_vs_time <- function(
     draws
 ) {
     plot <-

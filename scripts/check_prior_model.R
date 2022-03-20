@@ -43,18 +43,18 @@ prior_model_fit %>%
 
 prior_model_fit %>%
     spread_draws(rate) %>%
-    plot_drawn_prior_rate()
+    plot_prior_rate()
 
 ################################################################################
 # Check predictive prior
 prior_model_fit %>%
     spread_draws(time[t], score[t]) %>%
-    plot_drawn_scores()
+    plot_prior_scores()
 
 prior_model_fit %>%
     spread_draws(ttp[t]) %>%
-    plot_drawn_ttp_distribution()
+    plot_prior_ttp_distribution()
 
 prior_model_fit %>%
     spread_draws(time[t], ttp[t]) %>%
-    plot_drawn_ttp_vs_time()
+    plot_prior_ttp_vs_time()
