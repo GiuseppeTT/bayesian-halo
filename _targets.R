@@ -51,11 +51,11 @@ prior_targets <- list(
     ),
     tar_target(
         prior_model,
-        command = create_prior_model(prior_model_path)
+        create_prior_model(prior_model_path)
     ),
     tar_target(
         prior_model_data,
-        command = create_prior_model_data()
+        create_prior_model_data()
     ),
     tar_target(
         prior_model_fit,
@@ -105,11 +105,11 @@ model_targets <- list(
     ),
     tar_target(
         model,
-        command = create_model(model_path)
+        create_model(model_path)
     ),
     tar_target(
         model_data,
-        command = create_model_data(data)
+        create_model_data(data)
     ),
     tar_target(
         model_fit,
