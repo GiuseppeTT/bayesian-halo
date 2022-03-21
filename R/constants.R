@@ -1,17 +1,13 @@
 ################################################################################
 # Define constants
-RAW_SCORES_PATH <- "data/raw/scores.csv"
-CLEAN_SCORES_PATH <- "data/clean/scores.feather"
-COMPILED_MODEL_PATH <- "models"
+RAW_DATA_PATH <- "data/raw/scores.csv"
+CLEAN_DATA_PATH <- "data/clean/scores.feather"
+STAN_OUTPUT_PATH <- "stan_output"
 PRIOR_MODEL_PATH <- "stan/prior_model.stan"
 MODEL_PATH <- "stan/model.stan"
-
-RAW_SCORES_COLUMN_TYPES <- cols(
-    game = col_double(),
-    time = col_time(format = "%M:%S:00"),
-    blue = col_double(),
-    red = col_double()
-)
+RESULTS_PATH <- "results/"
+REPORT_SOURCE_PATH <- "Rmd/report.Rmd"
+REPORT_OUTPUT_PATH <- here::here("results/report.html")
 
 GAME_MIN_DURATION <- 0
 GAME_MAX_DURATION <- 15
@@ -24,5 +20,5 @@ POSTERIOR_PLOT_SAMPLE_COUNT <- 1000
 CHAIN_COUNT <- 4
 SEED <- 42
 
-ALPHA <- 0.1
+ALPHA <- 0.01
 FONT_SIZE <- 20
