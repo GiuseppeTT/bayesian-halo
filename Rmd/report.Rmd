@@ -1,6 +1,6 @@
 ---
-title: Report
-output_format: html_document
+title: Bayesian halo
+output: distill::distill_article
 ---
 
 ```{r setup, include = FALSE}
@@ -17,13 +17,31 @@ library(gt)
 library(targets)
 ```
 
+# Too long, didn't read (aka abstract)
+
+TODO.
+
 # Introduction
 
-TODO
+TODO.
 
 # Dataset
 
 TODO. Check `data/README.md`.
+
+# Exploratory data analysis
+
+```{r}
+tar_read(observed_score_plot)
+```
+
+```{r}
+tar_read(observed_ttp_vs_time_plot)
+```
+
+```{r}
+tar_read(observed_ttp_plot)
+```
 
 # Model
 
@@ -58,20 +76,6 @@ tar_read(prior_model_ttp_vs_time_plot)
 
 ```{r}
 tar_read(prior_model_ttp_plot)
-```
-
-# Exploratory data analysis
-
-```{r}
-tar_read(observed_score_plot)
-```
-
-```{r}
-tar_read(observed_ttp_vs_time_plot)
-```
-
-```{r}
-tar_read(observed_ttp_plot)
 ```
 
 # Results
