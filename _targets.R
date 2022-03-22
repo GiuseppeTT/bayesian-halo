@@ -5,11 +5,11 @@ library(tarchetypes)
 
 ################################################################################
 # Source auxiliary files
-source("R/constants.R")
-source("R/functions_data.R")
-source("R/functions_prior.R")
-source("R/functions_exploratory_analysis.R")
-source("R/functions_model.R")
+source(here::here("R/constants.R"))
+source(here::here("R/functions_data.R"))
+source(here::here("R/functions_prior.R"))
+source(here::here("R/functions_exploratory_analysis.R"))
+source(here::here("R/functions_model.R"))
 
 ################################################################################
 # Set R options

@@ -1,12 +1,12 @@
 ################################################################################
 # Define constants
-RAW_DATA_PATH <- "data/raw/scores.csv"
-CLEAN_DATA_PATH <- "data/clean/scores.feather"
-STAN_OUTPUT_PATH <- "stan_output"
-PRIOR_MODEL_PATH <- "stan/prior_model.stan"
-MODEL_PATH <- "stan/model.stan"
-RESULTS_PATH <- "results/"
-REPORT_SOURCE_PATH <- "Rmd/report.Rmd"
+RAW_DATA_PATH <- here::here("data/raw/scores.csv")
+CLEAN_DATA_PATH <- here::here("data/clean/scores.feather")
+STAN_OUTPUT_PATH <- here::here("stan_output")
+PRIOR_MODEL_PATH <- here::here("stan/prior_model.stan")
+MODEL_PATH <- here::here("stan/model.stan")
+RESULTS_PATH <- here::here("results/")
+REPORT_SOURCE_PATH <- here::here("Rmd/report.Rmd")
 REPORT_OUTPUT_PATH <- here::here("results/report.html")
 
 GAME_MIN_DURATION <- 0
