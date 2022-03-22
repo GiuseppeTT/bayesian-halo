@@ -31,16 +31,24 @@ data_targets <- list(
         RAW_DATA_PATH
     ),
     tar_target(
-        raw_data_validation,
-        validate_raw_data(raw_data)
-    ),
-    tar_target(
         raw_data,
         read_raw_data(raw_data_path)
     ),
     tar_target(
+        is_raw_data_valid,
+        validate_raw_data(raw_data)
+    ),
+    tar_target(
         data,
-        clean_data(raw_data)
+        command = {
+            if (is_raw_data_valid) {
+                data <- clean_data(raw_data)
+            } else {
+                stop("Data not valid. Check `is_raw_data_valid` target")
+            }
+
+            data
+        }
     )
 )
 

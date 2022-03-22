@@ -21,7 +21,8 @@ read_raw_data <- function(
 validate_raw_data <- function(
     raw_data
 ) {
-    raw_data %>%
+    validations <-
+        raw_data %>%
         group_by(game) %>%
         summarise(
             is_time_non_increasing = all(time <= lag(time), na.rm = TRUE),
@@ -36,8 +37,19 @@ validate_raw_data <- function(
             is_red_score_non_decreasing = all(red >= lag(red), na.rm = TRUE),
             is_red_score_in_the_right_range = all(GAME_MIN_SCORE <= red & red <= GAME_MAX_SCORE)
         ) %>%
-        pivot_longer(-game, names_to = "validation", values_to = "result") %>%
-        return()
+        ungroup()
+
+    validations <-
+        validations %>%
+        pivot_longer(-game, names_to = "validation", values_to = "result")
+
+    results <-
+        validations %>%
+        pull(result)
+
+    is_raw_data_valid <- all(results)
+
+    return(is_raw_data_valid)
 }
 
 clean_data <- function(
