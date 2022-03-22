@@ -4,7 +4,6 @@ read_raw_data <- function(
     raw_data_path
 ) {
     column_types <- cols(
-        game = col_double(),
         time = col_time(format = "%M:%S:00"),
         blue = col_double(),
         red = col_double()
@@ -23,7 +22,6 @@ validate_raw_data <- function(
 ) {
     validations <-
         raw_data %>%
-        group_by(game) %>%
         summarise(
             is_time_non_increasing = all(time <= lag(time), na.rm = TRUE),
             is_time_in_the_right_range = all(
@@ -36,12 +34,11 @@ validate_raw_data <- function(
 
             is_red_score_non_decreasing = all(red >= lag(red), na.rm = TRUE),
             is_red_score_in_the_right_range = all(GAME_MIN_SCORE <= red & red <= GAME_MAX_SCORE)
-        ) %>%
-        ungroup()
+        )
 
     validations <-
         validations %>%
-        pivot_longer(-game, names_to = "validation", values_to = "result")
+        pivot_longer(everything(), names_to = "validation", values_to = "result")
 
     results <-
         validations %>%
@@ -74,14 +71,14 @@ clean_data <- function(
 
     data <-
         data %>%
-        group_by(game, team) %>%
+        group_by(team) %>%
         arrange(time, .by_group = TRUE) %>%
         filter(has_changed(score, keep_first = TRUE)) %>%
         ungroup()
 
     data <-
         data %>%
-        group_by(game, team) %>%
+        group_by(team) %>%
         mutate(ttp = time - lag(time)) %>%
         ungroup()
 

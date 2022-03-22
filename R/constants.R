@@ -1,7 +1,6 @@
 ################################################################################
 # Define constants
-RAW_DATA_PATH <- here::here("data/raw/scores.csv")
-CLEAN_DATA_PATH <- here::here("data/clean/scores.feather")
+RAW_DATA_PATH <- here::here("data/raw/train.csv")
 STAN_OUTPUT_PATH <- here::here("stan_output")
 PRIOR_MODEL_PATH <- here::here("stan/prior_model.stan")
 MODEL_PATH <- here::here("stan/model.stan")
