@@ -16,7 +16,7 @@ create_prior_model_data <- function(
 ) {
     prior_model_data <- list(
         max_score = GAME_MAX_SCORE,
-        mean_rate_of_rates = GAME_MAX_SCORE / GAME_MAX_DURATION
+        mean_rate_of_rates = PRIOR_MEAN_RATE_OF_RATES
     )
 
     return(prior_model_data)

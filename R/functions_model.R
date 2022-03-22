@@ -22,7 +22,7 @@ create_model_data <- function(
 
     model_data <- c(
         model_data,
-        mean_rate_of_rates = GAME_MAX_SCORE / GAME_MAX_DURATION
+        mean_rate_of_rates = PRIOR_MEAN_RATE_OF_RATES
     )
 
     return(model_data)
