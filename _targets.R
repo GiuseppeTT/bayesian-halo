@@ -25,30 +25,45 @@ tar_option_set(
     )
 )
 
-data_targets <- list(
+train_data_targets <- list(
     tar_file(
-        raw_data_path,
-        RAW_DATA_PATH
+        raw_train_data_path,
+        RAW_TRAIN_DATA_PATH
     ),
     tar_target(
-        raw_data,
-        read_raw_data(raw_data_path)
+        raw_train_data,
+        read_raw_data(raw_train_data_path)
     ),
     tar_target(
-        is_raw_data_valid,
-        validate_raw_data(raw_data)
+        is_raw_train_data_valid,
+        validate_raw_data(raw_train_data)
     ),
     tar_target(
-        data,
+        train_data,
         command = {
-            if (is_raw_data_valid) {
-                data <- clean_data(raw_data)
+            if (is_raw_train_data_valid) {
+                train_data <- clean_data(raw_train_data)
             } else {
-                stop("Data not valid. Check `is_raw_data_valid` target")
+                stop("Train data not valid. Check `is_raw_train_data_valid` target")
             }
 
-            data
+            train_data
         }
+    )
+)
+
+exploratory_analysis_targets <- list(
+    tar_target(
+        observed_score_plot,
+        plot_observed_score(train_data)
+    ),
+    tar_target(
+        observed_ttp_plot,
+        plot_observed_ttp(train_data)
+    ),
+    tar_target(
+        observed_ttp_vs_time_plot,
+        plot_observed_ttp_vs_time(train_data)
     )
 )
 
@@ -91,18 +106,30 @@ prior_targets <- list(
     )
 )
 
-exploratory_analysis_targets <- list(
-    tar_target(
-        observed_score_plot,
-        plot_observed_score(data)
+test_data_targets <- list(
+    tar_file(
+        raw_test_data_path,
+        RAW_TEST_DATA_PATH
     ),
     tar_target(
-        observed_ttp_plot,
-        plot_observed_ttp(data)
+        raw_test_data,
+        read_raw_data(raw_test_data_path)
     ),
     tar_target(
-        observed_ttp_vs_time_plot,
-        plot_observed_ttp_vs_time(data)
+        is_raw_test_data_valid,
+        validate_raw_data(raw_test_data)
+    ),
+    tar_target(
+        test_data,
+        command = {
+            if (is_raw_test_data_valid) {
+                test_data <- clean_data(raw_test_data)
+            } else {
+                stop("test data not valid. Check `is_raw_test_data_valid` target")
+            }
+
+            test_data
+        }
     )
 )
 
@@ -117,11 +144,11 @@ model_targets <- list(
     ),
     tar_target(
         model_data,
-        create_model_data(data)
+        create_model_data(test_data)
     ),
     tar_target(
         model_fit,
-        fit_model(model, model_data, data)
+        fit_model(model, model_data, test_data)
     ),
     tar_target(
         model_rate_table,
@@ -141,15 +168,15 @@ model_targets <- list(
     ),
     tar_target(
         model_score_plot,
-        plot_model_score(model_fit, data)
+        plot_model_score(model_fit, test_data)
     ),
     tar_target(
         model_ttp_plot,
-        plot_model_ttp(model_fit, data)
+        plot_model_ttp(model_fit, test_data)
     ),
     tar_target(
         model_ttp_vs_time_plot,
-        plot_model_ttp_vs_time(model_fit, data)
+        plot_model_ttp_vs_time(model_fit, test_data)
     )
 )
 
@@ -162,9 +189,10 @@ report_targets <- list(
 )
 
 targets <- c(
-    data_targets,
-    prior_targets,
+    train_data_targets,
     exploratory_analysis_targets,
+    prior_targets,
+    test_data_targets,
     model_targets,
     report_targets
 )
