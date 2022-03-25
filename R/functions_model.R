@@ -132,7 +132,7 @@ plot_model_score <- function(
         )) +
         geom_step(alpha = ALPHA) +
         geom_step(aes(x = time, y = score, color = team, group = NULL), data = data, size = 2) +
-        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        scale_x_continuous(limits = c(GAME_MIN_TIME, GAME_MAX_TIME)) +
         scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
         scale_color_viridis_d() +
         theme_minimal(FONT_SIZE) +

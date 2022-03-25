@@ -80,7 +80,7 @@ plot_prior_model_score <- function(
         draws %>%
         ggplot(aes(x = time, y = score, group = .draw)) +
         geom_step(alpha = 10 * ALPHA) +
-        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        scale_x_continuous(limits = c(GAME_MIN_TIME, GAME_MAX_TIME)) +
         scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
         theme_minimal(FONT_SIZE) +
         labs(

@@ -25,8 +25,8 @@ validate_raw_data <- function(
         summarise(
             is_time_non_increasing = all(time <= lag(time), na.rm = TRUE),
             is_time_in_the_right_range = all(
-                hms::hms(minutes = GAME_MIN_DURATION) <= time &
-                time <= hms::hms(minutes = GAME_MAX_DURATION)
+                hms::hms(minutes = GAME_MIN_TIME) <= time &
+                time <= hms::hms(minutes = GAME_MAX_TIME)
             ),
 
             is_blue_score_non_decreasing = all(blue >= lag(blue), na.rm = TRUE),
@@ -61,7 +61,7 @@ clean_data <- function(
     data <-
         data %>%
         mutate(time = convert_time_to_minutes(time)) %>%
-        mutate(time = count_time_from_zero(time, start_time = GAME_MAX_DURATION))
+        mutate(time = count_time_from_zero(time, start_time = GAME_MAX_TIME))
 
     data <-
         data %>%
