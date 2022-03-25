@@ -44,3 +44,6 @@ vignettes/*.pdf
 # Added manually
 # Plot files
 Rplots.pdf
+
+# {target} files
+_targets

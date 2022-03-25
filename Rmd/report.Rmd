@@ -1,0 +1,109 @@
+---
+title: Bayesian halo
+output: distill::distill_article
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    echo = FALSE,
+    warning = FALSE,
+    message = FALSE
+)
+```
+
+```{r libraries}
+library(tidyverse)
+library(gt)
+library(targets)
+```
+
+# Too long, didn't read (aka abstract)
+
+TODO.
+
+# Introduction
+
+If you are like me, you have been playing halo infinite a lot in the past weeks. One game mode that I particular like is big team battle slayer in which 2 teams of 16 players each face each other. Each time one player of team A defeats a player of team B, team A earns a point. The first team to achieve 100 points first wins the game.
+
+If you are really like me, you have also been wondering about how to statistically model this game mode. Particularly, I was interested in calculating the probability of winning at each timepoint of a match. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question my work sets to answer using bayesian statistics.
+
+The report is divided into section. Section [Dataset] describes the dataset used and Section [Exploratory data analysis] presents an exploratory analysis of its content to undertand statistical properties of the game data. Based on this exploratory analysis, Section [Model] defines a bayesian model for the data and Seciton [Prior model analysis] shows a sintetic dataset for the given prior values. Finally, Section [Results] shows the results obtained when fitting the model to the full data and [Concluion] finishes the report with the final conclusions.
+
+# Dataset
+
+TODO. Check `data/README.md`.
+
+# Exploratory data analysis
+
+```{r}
+tar_read(observed_score_plot)
+```
+
+```{r}
+tar_read(observed_ttp_vs_score_plot)
+```
+
+```{r}
+tar_read(observed_ttp_plot)
+```
+
+# Model
+
+\begin{align}
+\text{mean rate of rates} &= \frac{\text{max score}}{2 / 3 \cdot \text{max duration}}
+= \frac{100 \text{ points}}{10 \text{ minutes}} \\
+\text{rate of rates} &= \frac{1}{\text{mean rate of rates}} \\
+\\
+\text{rate}^{\text{blue}} &\sim \text{Exponential}(\text{rate of rates}) \\
+\text{rate}^{\text{red}} &\sim \text{Exponential}(\text{rate of rates}) \\
+\\
+\text{ttp}^{\text{blue}}_i &= \text{time}^{\text{blue}}_i - \text{time}^{\text{blue}}_{i-1} \\
+\text{ttp}^{\text{red}}_i &= \text{time}^{\text{red}}_i - \text{time}^{\text{red}}_{i-1} \\
+\\
+\text{ttp}^{\text{blue}}_i &\sim \text{Exponential}(\text{rate}^{\text{blue}}) \\
+\text{ttp}^{\text{red}}_i &\sim \text{Exponential}(\text{rate}^{\text{red}})
+\end{align}
+
+# Prior model analysis
+
+```{r}
+tar_read(prior_model_rate_plot)
+```
+
+```{r}
+tar_read(prior_model_score_plot)
+```
+
+```{r}
+tar_read(prior_model_ttp_vs_score_plot)
+```
+
+```{r}
+tar_read(prior_model_ttp_plot)
+```
+
+# Results
+
+```{r}
+tar_read(model_rate_plot)
+```
+
+```{r}
+tar_read(model_contrast_plot)
+```
+
+```{r}
+tar_read(model_score_plot)
+```
+
+```{r}
+tar_read(model_ttp_vs_score_plot)
+```
+
+```{r}
+tar_read(model_ttp_plot)
+```
+
+# Conclusion
+
+TODO
