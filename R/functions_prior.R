@@ -113,22 +113,22 @@ plot_prior_model_ttp <- function(
     return(plot)
 }
 
-plot_prior_model_ttp_vs_time <- function(
+plot_prior_model_ttp_vs_score <- function(
     prior_model_fit
 ) {
     draws <-
         prior_model_fit %>%
-        spread_draws(time[t], ttp[t])
+        spread_draws(score[t], ttp[t])
 
     plot <-
         draws %>%
-        ggplot(aes(x = time, y = ttp, group = .draw)) +
+        ggplot(aes(x = score, y = ttp, group = .draw)) +
         geom_smooth(se = FALSE, color = alpha("black", ALPHA)) +
-        coord_cartesian(xlim = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        coord_cartesian(xlim = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
         scale_y_log10() +
         theme_minimal(FONT_SIZE) +
         labs(
-            x = "Time (minutes)",
+            x = "Score",
             y = "Time to point (minutes)"
         )
 

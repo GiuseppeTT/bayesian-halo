@@ -40,7 +40,7 @@ tar_read(observed_score_plot)
 ```
 
 ```{r}
-tar_read(observed_ttp_vs_time_plot)
+tar_read(observed_ttp_vs_score_plot)
 ```
 
 ```{r}
@@ -75,7 +75,7 @@ tar_read(prior_model_score_plot)
 ```
 
 ```{r}
-tar_read(prior_model_ttp_vs_time_plot)
+tar_read(prior_model_ttp_vs_score_plot)
 ```
 
 ```{r}
@@ -97,7 +97,7 @@ tar_read(model_score_plot)
 ```
 
 ```{r}
-tar_read(model_ttp_vs_time_plot)
+tar_read(model_ttp_vs_score_plot)
 ```
 
 ```{r}

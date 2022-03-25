@@ -172,13 +172,13 @@ plot_model_ttp <- function(
     return(plot)
 }
 
-plot_model_ttp_vs_time <- function(
+plot_model_ttp_vs_score <- function(
     model_fit,
     data
 ) {
     draws <-
         model_fit %>%
-        spread_draws(predicted_time[t], predicted_ttp[t]) %>%
+        spread_draws(predicted_score[t], predicted_ttp[t]) %>%
         sample_draws(POSTERIOR_PLOT_SAMPLE_COUNT) %>%
         ungroup() %>%
         recover_covariates(data, by = "t", team)
@@ -186,13 +186,13 @@ plot_model_ttp_vs_time <- function(
     plot <-
         draws %>%
         rename(Team = team) %>%
-        ggplot(aes(x = predicted_time, y = predicted_ttp, group = str_c(.draw, Team))) +
+        ggplot(aes(x = predicted_score, y = predicted_ttp, group = str_c(.draw, Team))) +
         geom_smooth(se = FALSE, color = alpha("black", ALPHA)) +
         facet_grid(cols = vars(Team), labeller = label_both) +
-        scale_x_continuous(limits = c(GAME_MIN_DURATION, GAME_MAX_DURATION)) +
+        scale_x_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
         theme_minimal(FONT_SIZE) +
         labs(
-            x = "Time (minutes)",
+            x = "Score",
             y = "Time to point (minutes)"
         )
 

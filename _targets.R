@@ -62,8 +62,8 @@ exploratory_analysis_targets <- list(
         plot_observed_ttp(train_data)
     ),
     tar_target(
-        observed_ttp_vs_time_plot,
-        plot_observed_ttp_vs_time(train_data)
+        observed_ttp_vs_score_plot,
+        plot_observed_ttp_vs_score(train_data)
     )
 )
 
@@ -101,8 +101,8 @@ prior_targets <- list(
         plot_prior_model_ttp(prior_model_fit)
     ),
     tar_target(
-        prior_model_ttp_vs_time_plot,
-        plot_prior_model_ttp_vs_time(prior_model_fit)
+        prior_model_ttp_vs_score_plot,
+        plot_prior_model_ttp_vs_score(prior_model_fit)
     )
 )
 
@@ -175,8 +175,8 @@ model_targets <- list(
         plot_model_ttp(model_fit, test_data)
     ),
     tar_target(
-        model_ttp_vs_time_plot,
-        plot_model_ttp_vs_time(model_fit, test_data)
+        model_ttp_vs_score_plot,
+        plot_model_ttp_vs_score(model_fit, test_data)
     )
 )
 
