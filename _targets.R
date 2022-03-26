@@ -155,16 +155,8 @@ train_model_targets <- list(
         table_model_rate(train_model_fit)
     ),
     tar_target(
-        train_model_contrast_table,
-        table_model_contrast(train_model_fit)
-    ),
-    tar_target(
         train_model_rate_plot,
         plot_model_rate(train_model_fit)
-    ),
-    tar_target(
-        train_model_contrast_plot,
-        plot_model_contrast(train_model_fit)
     ),
     tar_target(
         train_model_score_plot,
@@ -202,16 +194,8 @@ test_model_targets <- list(
         table_model_rate(test_model_fit)
     ),
     tar_target(
-        test_model_contrast_table,
-        table_model_contrast(test_model_fit)
-    ),
-    tar_target(
         test_model_rate_plot,
         plot_model_rate(test_model_fit)
-    ),
-    tar_target(
-        test_model_contrast_plot,
-        plot_model_contrast(test_model_fit)
     ),
     tar_target(
         test_model_score_plot,

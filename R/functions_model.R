@@ -72,40 +72,38 @@ plot_model_rate <- function(
 ) {
     draws <-
         model_fit %>%
-        spread_draws(rate[team])
+        spread_draws(rate[team], rate_contrast)
 
-    plot <-
-        draws %>%
-        ggplot(aes(x = team, y = rate)) +
-        stat_pointinterval(point_interval = "median_hdci") +
-        scale_y_continuous(limits = c(0, NA)) +
-        coord_flip() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Team",
-            y = "Rate"
-        )
-
-    return(plot)
-}
-
-plot_model_contrast <- function(
-    model_fit
-) {
     draws <-
-        model_fit %>%
-        spread_draws(rate_contrast)
+        draws %>%
+        pivot_wider(names_from = "team", values_from = "rate") %>%
+        pivot_longer(
+            c(Blue, Red, rate_contrast),
+            names_to = "parameter",
+            values_to = "value"
+        ) %>%
+        mutate(parameter = fct_recode(
+            parameter,
+            "Blue's point rate" = "Blue",
+            "Red's point rate" = "Red",
+            "Rate contrast" = "rate_contrast"
+        )) %>%
+        mutate(parameter = fct_relevel(
+            parameter,
+            "Blue's point rate",
+            "Red's point rate",
+            "Rate contrast"
+        ))
 
     plot <-
         draws %>%
-        ggplot(aes(x = "Rate contrast", y = rate_contrast)) +
+        ggplot(aes(x = fct_rev(parameter), y = value)) +
         stat_pointinterval(point_interval = "median_hdci") +
-        geom_hline(yintercept = 0, color = "red", size = 2) +
         coord_flip() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = NULL,
-            y = "Rate"
+            y = NULL
         )
 
     return(plot)

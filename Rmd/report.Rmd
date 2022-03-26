@@ -139,10 +139,6 @@ tar_read(train_model_rate_plot)
 ```
 
 ```{r}
-tar_read(train_model_contrast_plot)
-```
-
-```{r}
 tar_read(train_model_score_plot)
 ```
 
@@ -158,10 +154,6 @@ tar_read(train_model_score_plot)
 
 ```{r}
 tar_read(test_model_rate_plot)
-```
-
-```{r}
-tar_read(test_model_contrast_plot)
 ```
 
 ```{r}
