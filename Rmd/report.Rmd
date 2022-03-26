@@ -1,5 +1,6 @@
 ---
 title: Bayesian halo
+author: Giuseppe Tinti Tomio
 output: distill::distill_article
 ---
 
@@ -17,23 +18,41 @@ library(gt)
 library(targets)
 ```
 
-# Too long, didn't read (aka abstract)
+# Too long, didn't read
 
 TODO.
 
 # Introduction
 
-If you are like me, you have been playing halo infinite a lot in the past weeks. One game mode that I particularly like is big team battle slayer in which 2 teams of 16 players face each other in a battlefield. Each time one player of team A defeats a player of team B, team A earns a point. The first team to achieve 100 points first wins the game.
+If you are like me, you have been playing Halo Infinite a lot in the past weeks. One game mode that I particularly like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other in a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game.
 
-Now if you are really like me, you have also been wondering about how to statistically model this game mode. Specifically, I was interested in calculating the probability of my team winning at each timepoint of a match. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question my work sets to answer using bayesian statistics.
+Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning giving the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question my work sets to answer using bayesian statistics.
+
+<!--
+    The report is divided into sections. Section [Dataset] describes the dataset used and Section [Exploratory data analysis] presents an exploratory analysis of its content to understand statistical properties of the game data. Based on this exploratory analysis, Section [Model] defines a Bayesian model for the data and Section [Prior model analysis] shows a synthetic dataset for the given prior values. Finally, Section [Results] shows the results obtained when fitting the model to the full data and [Conclusion] finishes the report with the final conclusions.
+-->
 
 # Dataset
 
-TODO. Check `data/README.md`.
+To answer the question proposed, I selected two matches of Halo BTBS from YouTube and manually filled two spreadsheets with game statistics. The first game is available at https://youtu.be/cANMWiYTD84 and was used to gain some quantitative knowledge about this type of data, propose a model and check valid values for a prior. The second game is available at https://youtu.be/kuH9nhdzt64 and was used to fit the proposed model in a novel dataset to check the model's performance.
+
+Each dataset is composed of three variables (columns). They are
+
+- **time:** Time at which the score was recorded.
+- **blue:** Score of team blue at the time. Team blue is the team of the player who recorded the gameplay.
+- **red:** Score of team red at the time. Team red is the enemy team of the player who recorded the gameplay.
+
+Due to the way the data was recorded, there are a few concerns which could not be addressed. They are:
+
+- The data was extracted from a gameplay available at YouTube and, therefore, might not be representative. This is because people tend to publish only games where they (and therefore their team) had a good performance.
+- The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point. Besides, there are times in which the scoreboard is not visible or or is only partially visible which might have impacted the annotated data.
+- The maximum time resolution is 1 second as it is constrained by the in-game time resolution, obtained from the scoreboard timer.
 
 # Exploratory data analysis
 
-```{r}
+Figure \@ref(fig:train-observed-score)
+
+```{r train-observed-score, fig.cap = "Score progression of both teams as observed in the train dataset."}
 tar_read(observed_score_plot)
 ```
 
@@ -65,7 +84,7 @@ tar_read(observed_ttp_plot)
 # Prior model analysis
 
 ```{r}
-tar_read(prior_model_rate_plot)
+# tar_read(prior_model_rate_plot)
 ```
 
 ```{r}
@@ -73,11 +92,11 @@ tar_read(prior_model_score_plot)
 ```
 
 ```{r}
-tar_read(prior_model_ttp_vs_score_plot)
+# tar_read(prior_model_ttp_vs_score_plot)
 ```
 
 ```{r}
-tar_read(prior_model_ttp_plot)
+# tar_read(prior_model_ttp_plot)
 ```
 
 # Results
@@ -95,7 +114,7 @@ tar_read(model_score_plot)
 ```
 
 ```{r}
-tar_read(model_ttp_vs_score_plot)
+# tar_read(model_ttp_vs_score_plot)
 ```
 
 ```{r}
