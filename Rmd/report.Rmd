@@ -58,7 +58,7 @@ In the following exploratory analysis, I will demonstrate how the following prop
 
 - Each point is earned independently from each other.
 - The average time between points is constant throughout the game. The average differs between the teams.
-- The time between points follows an exponential distribution. The distributions differ between the teams.
+- The time between points follows an exponential distribution. The distribution differ between the teams.
 
 We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear which suggests that, on average, the teams earn points at a constant rate.
 
@@ -66,36 +66,38 @@ We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which sum
 tar_read(observed_score_plot)
 ```
 
-To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression lines, the average TBP is pretty constant throughout the game.
+To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is pretty constant throughout the game.
 
 ```{r train-observed-tbp-vs-score-plot, fig.cap = "Time between points (TBP) for each team as a function of score, as observed in the train dataset."}
 tar_read(observed_tbp_vs_score_plot)
 ```
 
-Still about the time between points, Figure \@ref(fig:train-observed-tbp) plots the estimated distribution for each team as observed in the train dataset. They have an exponential decay which favors an exponential distribution.
+Still about the time between points, Figure \@ref(fig:train-observed-tbp) plots the estimated distribution for each team as observed in the train dataset. The estimated distributions have an exponential decay which favors an exponential distribution.
 
 ```{r train-observed-tbp, fig.cap = "Estimated TBP distribution for each team as observed in the train dataset."}
 tar_read(observed_tbp_plot)
 ```
 
-Finally, to evaluate the indepndence between points, Figure BLAH.
+Finally, to evaluate the independence between points, Figure BLAH.
 
 # Model
 
-Accounting for all the discoveries made in Section [Exploratory data analysis], I came up with the following model. It begins by assuming that each team has a different constant tbp rate, namely $\text{rate}^{\text{blue}}$ and $\text{rate}^{\text{red}}$. This means that independently from team red and its own history, team blue will take $1 / \text{rate}^{\text{blue}}$ minutes on average to make the next point.
+Accounting for all the discoveries made in Section [Exploratory data analysis], I came up with the following model. It begins by assuming that each team has a different constant TBP rate, namely `point_rate[blue]` and `point_rate[red]`. This means that independently from team red and its own history, team blue will take $1 / \text{rate}^{\text{blue}}$ minutes on average to make the next point.
 
 It assumes that the time between points are sampled from an Exponential distribution with
 
 ```R
 # Data
-time[blue][1], ..., time[blue][blue_sample_size]
-time[red][1], ..., time[red][red_sample_size]
+point_time[blue][1], ..., point_time[blue][blue_last_score]
+point_time[red][1], ..., point_time[red][red_last_score]
 
 # Transformed data
-tbp[blue][i] = time[blue][i] - time[blue][i - 1]
-tbp[red][j] = time[red][j] - time[red][j - 1]
+tbp[blue][i] = point_time[blue][i] - point_time[blue][i - 1]
+tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
 
 # Prior
+max_score = 100
+max_time = 15
 mean_rate of rates = max_score / (2 / 3 * max_time)
 rate_of_rates = 1 / mean_rate_of_rates
 
@@ -110,11 +112,13 @@ tbp[red][j] ~ Exponential(point_rate[red])
 
 # Prior model analysis
 
+Before fitting the model to the data, it is intesreting to selecet an appropriate prior. To do that, we can simulate data from the model using only the prior information. That is, without providing data. Figure \@ref(fig:prior-score-plot) summarizes the simulated data. It shows the score progression for a hypothetical team as simulated from the prior model.
+
 ```{r}
 # tar_read(prior_model_rate_plot)
 ```
 
-```{r}
+```{r prior-score-plot, fig.cap = "Score progression for a hypothetical team as simulated from the prior model."}
 tar_read(prior_model_score_plot)
 ```
 
@@ -128,24 +132,48 @@ tar_read(prior_model_score_plot)
 
 # Results
 
+## Train dataset
+
 ```{r}
-tar_read(model_rate_plot)
+tar_read(train_model_rate_plot)
 ```
 
 ```{r}
-tar_read(model_contrast_plot)
+tar_read(train_model_contrast_plot)
 ```
 
 ```{r}
-tar_read(model_score_plot)
+tar_read(train_model_score_plot)
 ```
 
 ```{r}
-# tar_read(model_tbp_vs_score_plot)
+# tar_read(train_model_tbp_vs_score_plot)
 ```
 
 ```{r}
-# tar_read(model_tbp_plot)
+# tar_read(train_model_tbp_plot)
+```
+
+## Test dataset
+
+```{r}
+tar_read(test_model_rate_plot)
+```
+
+```{r}
+tar_read(test_model_contrast_plot)
+```
+
+```{r}
+tar_read(test_model_score_plot)
+```
+
+```{r}
+# tar_read(test_model_tbp_vs_score_plot)
+```
+
+```{r}
+# tar_read(test_model_tbp_plot)
 ```
 
 # Conclusion
