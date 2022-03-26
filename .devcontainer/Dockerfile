@@ -61,10 +61,12 @@ RUN if [ "${ENABLE_JUPYTER}" = "true" ]; then \
 
 # [Optional] Uncomment this section to install additional OS packages.
 # libglpk-dev for {targets} R package
+# pandoc for {rmarkdown} R package
 RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-        libglpk-dev
+        libglpk-dev \
+        pandoc
 
 # [Optional] Uncomment this section to install additional R packages.
 RUN install2.r --error --skipinstalled --ncpus -1 \
