@@ -1,7 +1,11 @@
 ---
 title: Bayesian halo
+description: TODO
+date: "`r Sys.Date()`"
 author: Giuseppe Tinti Tomio
-output: distill::distill_article
+output:
+    distill::distill_article:
+        toc: true
 ---
 
 ```{r setup, include = FALSE}
@@ -24,9 +28,9 @@ TODO.
 
 # Introduction
 
-If you are like me, you have been playing Halo Infinite a lot in the past weeks. One game mode that I particularly like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other in a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game.
+If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/games/halo-infinite) a lot in the past weeks. One game mode that I particularly like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other in a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game. If no team hits 100 points by the 15 minutes mark, the team with the biggest score wins.
 
-Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning giving the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question my work sets to answer using bayesian statistics.
+Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning given the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question my work sets to answer using bayesian statistics.
 
 <!--
     The report is divided into sections. Section [Dataset] describes the dataset used and Section [Exploratory data analysis] presents an exploratory analysis of its content to understand statistical properties of the game data. Based on this exploratory analysis, Section [Model] defines a Bayesian model for the data and Section [Prior model analysis] shows a synthetic dataset for the given prior values. Finally, Section [Results] shows the results obtained when fitting the model to the full data and [Conclusion] finishes the report with the final conclusions.
@@ -34,9 +38,9 @@ Now if you are really like me, you have also been wondering about how to statist
 
 # Dataset
 
-To answer the question proposed, I selected two matches of Halo BTBS from YouTube and manually filled two spreadsheets with game statistics. The first game is available at https://youtu.be/cANMWiYTD84 and was used to gain some quantitative knowledge about this type of data, propose a model and check valid values for a prior. The second game is available at https://youtu.be/kuH9nhdzt64 and was used to fit the proposed model in a novel dataset to check the model's performance.
+To answer the question proposed, I selected two matches of Halo BTBS from YouTube and manually filled two spreadsheets with game statistics. The first game is available at https://youtu.be/cANMWiYTD84 and defines the train dataset. It was used to gain some quantitative knowledge about this type of data, propose a model and check valid values for a prior. The second game is available at https://youtu.be/kuH9nhdzt64 and defines the test dataset. It was used to fit the proposed model in a novel dataset to check the model's performance.
 
-Each dataset is composed of three variables (columns). They are
+Each dataset is composed of three variables (columns). They are:
 
 - **time:** Time at which the score was recorded.
 - **blue:** Score of team blue at the time. Team blue is the team of the player who recorded the gameplay.
@@ -45,41 +49,64 @@ Each dataset is composed of three variables (columns). They are
 Due to the way the data was recorded, there are a few concerns which could not be addressed. They are:
 
 - The data was extracted from a gameplay available at YouTube and, therefore, might not be representative. This is because people tend to publish only games where they (and therefore their team) had a good performance.
-- The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point. Besides, there are times in which the scoreboard is not visible or or is only partially visible which might have impacted the annotated data.
+- The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point. Besides, there are times in which the scoreboard is not visible or is only partially visible which might have impacted the annotated data.
 - The maximum time resolution is 1 second as it is constrained by the in-game time resolution, obtained from the scoreboard timer.
 
 # Exploratory data analysis
 
-Figure \@ref(fig:train-observed-score)
+In the following exploratory analysis, I will demonstrate how the following properties about the data hold true, at least to an approximate extent.
 
-```{r train-observed-score, fig.cap = "Score progression of both teams as observed in the train dataset."}
+- Each point is earned independently from each other.
+- The average time between points is constant throughout the game. The average differs between the teams.
+- The time between points follows an exponential distribution. The distributions differ between the teams.
+
+We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear which suggests that, on average, the teams earn points at a constant rate.
+
+```{r train-observed-score-plot, fig.cap = "Score progression for both teams as observed in the train dataset."}
 tar_read(observed_score_plot)
 ```
 
-```{r}
-tar_read(observed_ttp_vs_score_plot)
+To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression lines, the average TBP is pretty constant throughout the game.
+
+```{r train-observed-tbp-vs-score-plot, fig.cap = "Time between points (TBP) for each team as a function of score, as observed in the train dataset."}
+tar_read(observed_tbp_vs_score_plot)
 ```
 
-```{r}
-tar_read(observed_ttp_plot)
+Still about the time between points, Figure \@ref(fig:train-observed-tbp) plots the estimated distribution for each team as observed in the train dataset. They have an exponential decay which favors an exponential distribution.
+
+```{r train-observed-tbp, fig.cap = "Estimated TBP distribution for each team as observed in the train dataset."}
+tar_read(observed_tbp_plot)
 ```
+
+Finally, to evaluate the indepndence between points, Figure BLAH.
 
 # Model
 
-\begin{align}
-\text{mean rate of rates} &= \frac{\text{max score}}{2 / 3 \cdot \text{max duration}}
-= \frac{100 \text{ points}}{10 \text{ minutes}} \\
-\text{rate of rates} &= \frac{1}{\text{mean rate of rates}} \\
-\\
-\text{rate}^{\text{blue}} &\sim \text{Exponential}(\text{rate of rates}) \\
-\text{rate}^{\text{red}} &\sim \text{Exponential}(\text{rate of rates}) \\
-\\
-\text{ttp}^{\text{blue}}_i &= \text{time}^{\text{blue}}_i - \text{time}^{\text{blue}}_{i-1} \\
-\text{ttp}^{\text{red}}_i &= \text{time}^{\text{red}}_i - \text{time}^{\text{red}}_{i-1} \\
-\\
-\text{ttp}^{\text{blue}}_i &\sim \text{Exponential}(\text{rate}^{\text{blue}}) \\
-\text{ttp}^{\text{red}}_i &\sim \text{Exponential}(\text{rate}^{\text{red}})
-\end{align}
+Accounting for all the discoveries made in Section [Exploratory data analysis], I came up with the following model. It begins by assuming that each team has a different constant tbp rate, namely $\text{rate}^{\text{blue}}$ and $\text{rate}^{\text{red}}$. This means that independently from team red and its own history, team blue will take $1 / \text{rate}^{\text{blue}}$ minutes on average to make the next point.
+
+It assumes that the time between points are sampled from an Exponential distribution with
+
+```R
+# Data
+time[blue][1], ..., time[blue][blue_sample_size]
+time[red][1], ..., time[red][red_sample_size]
+
+# Transformed data
+tbp[blue][i] = time[blue][i] - time[blue][i - 1]
+tbp[red][j] = time[red][j] - time[red][j - 1]
+
+# Prior
+mean_rate of rates = max_score / (2 / 3 * max_time)
+rate_of_rates = 1 / mean_rate_of_rates
+
+# Parameters
+point_rate[blue] ~ Exponential(rate_of_rates)
+point_rate[red] ~ Exponential(rate_of_rates)
+
+# Likelihood
+tbp[blue][i] ~ Exponential(point_rate[blue])
+tbp[red][j] ~ Exponential(point_rate[red])
+```
 
 # Prior model analysis
 
@@ -92,11 +119,11 @@ tar_read(prior_model_score_plot)
 ```
 
 ```{r}
-# tar_read(prior_model_ttp_vs_score_plot)
+# tar_read(prior_model_tbp_vs_score_plot)
 ```
 
 ```{r}
-# tar_read(prior_model_ttp_plot)
+# tar_read(prior_model_tbp_plot)
 ```
 
 # Results
@@ -114,11 +141,11 @@ tar_read(model_score_plot)
 ```
 
 ```{r}
-# tar_read(model_ttp_vs_score_plot)
+# tar_read(model_tbp_vs_score_plot)
 ```
 
 ```{r}
-tar_read(model_ttp_plot)
+# tar_read(model_tbp_plot)
 ```
 
 # Conclusion

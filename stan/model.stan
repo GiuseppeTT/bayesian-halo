@@ -8,7 +8,7 @@ data {
 transformed data {
     real<lower = 0> rate_of_rates;
     array[team_count] real<lower = 0> last_time;
-    array[sample_size] real ttp;
+    array[sample_size] real tbp;
 
     rate_of_rates = 1 / mean_rate_of_rates;
 
@@ -17,7 +17,7 @@ transformed data {
     }
 
     for (i in 2:sample_size) {
-        ttp[i] = time[i] - last_time[team[i]];
+        tbp[i] = time[i] - last_time[team[i]];
         last_time[team[i]] = time[i];
     }
 }
@@ -28,11 +28,11 @@ model {
     rate ~ exponential(rate_of_rates);
 
     for (i in 2:sample_size)
-        ttp[i] ~ exponential(rate[team[i]]);
+        tbp[i] ~ exponential(rate[team[i]]);
 }
 generated quantities {
     real rate_contrast;
-    array[sample_size] real predicted_ttp;
+    array[sample_size] real predicted_tbp;
     array[team_count] real<lower = 0> predicted_last_time;
     array[sample_size] real<lower = 0> predicted_time;
     array[team_count] int<lower = 0> predicted_last_score;
@@ -40,7 +40,7 @@ generated quantities {
 
     rate_contrast = rate[1] - rate[2];
 
-    // predicted_ttp[1] = NaN;
+    // predicted_tbp[1] = NaN;
     predicted_time[1] = 0;
     predicted_score[1] = 0;
 
@@ -54,9 +54,9 @@ generated quantities {
     }
 
     for (i in 2:sample_size) {
-        predicted_ttp[i] = exponential_rng(rate[team[i]]);
+        predicted_tbp[i] = exponential_rng(rate[team[i]]);
 
-        predicted_time[i] = predicted_last_time[team[i]] + predicted_ttp[i];
+        predicted_time[i] = predicted_last_time[team[i]] + predicted_tbp[i];
         predicted_last_time[team[i]] = predicted_time[i];
 
         predicted_score[i] = predicted_last_score[team[i]] + 1;

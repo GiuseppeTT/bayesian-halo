@@ -20,17 +20,17 @@ plot_observed_score <- function(
     return(plot)
 }
 
-plot_observed_ttp <- function(
+plot_observed_tbp <- function(
     data
 ) {
     plot <-
         data %>%
-        ggplot(aes(x = ttp, color = team)) +
+        ggplot(aes(x = tbp, color = team)) +
         geom_density(size = 2) +
         scale_color_viridis_d() +
         theme_minimal(FONT_SIZE) +
         labs(
-            x = "Time to point (minutes)",
+            x = "Time between points (minutes)",
             y = "Density",
             color = "Team"
         )
@@ -38,13 +38,13 @@ plot_observed_ttp <- function(
     return(plot)
 }
 
-plot_observed_ttp_vs_score <- function(
+plot_observed_tbp_vs_score <- function(
     data
 ) {
     plot <-
         data %>%
         rename(Team = team) %>%
-        ggplot(aes(x = score, y = ttp)) +
+        ggplot(aes(x = score, y = tbp)) +
         geom_point() +
         geom_smooth(size = 2) +
         facet_grid(cols = vars(Team), labeller = label_both) +
@@ -52,7 +52,7 @@ plot_observed_ttp_vs_score <- function(
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Score",
-            y = "Time to point (minutes)"
+            y = "Time between points (minutes)"
         )
 
     return(plot)
