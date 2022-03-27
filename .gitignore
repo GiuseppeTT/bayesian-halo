@@ -47,3 +47,6 @@ Rplots.pdf
 
 # {target} files
 _targets
+
+# Debug files
+debug.R
