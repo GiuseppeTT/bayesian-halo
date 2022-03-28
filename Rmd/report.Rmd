@@ -6,6 +6,7 @@ author: Giuseppe Tinti Tomio
 output:
     distill::distill_article:
         toc: true
+repository_url: https://github.com/GiuseppeTT/bayesian-halo
 ---
 
 ```{r setup, include = FALSE}
@@ -38,7 +39,7 @@ Now if you are really like me, you have also been wondering about how to statist
 
 # Dataset
 
-To answer the question proposed, I selected two matches of Halo BTBS from YouTube and manually filled two spreadsheets with game statistics. The first game is available at https://youtu.be/cANMWiYTD84 and defines the train dataset. It was used to gain some quantitative knowledge about this type of data, propose a model and check valid values for a prior. The second game is available at https://youtu.be/kuH9nhdzt64 and defines the test dataset. It was used to fit the proposed model in a novel dataset to check the model's performance.
+To answer the question proposed, I selected two matches of Halo BTBS from YouTube and manually filled two spreadsheets with game statistics. The first game is available at https://youtu.be/cANMWiYTD84 and defines the train dataset. It was used to gain some quantitative knowledge about this type of data, propose a model and check valid values for a prior distribution. The second game is available at https://youtu.be/kuH9nhdzt64 and defines the test dataset. It was used to fit the proposed model in a novel dataset to check the model's performance.
 
 Each dataset is composed of three variables (columns). They are:
 
@@ -54,71 +55,95 @@ Due to the way the data was recorded, there are a few concerns which could not b
 
 # Exploratory data analysis
 
-In the following exploratory analysis, I will demonstrate how the following properties about the data hold true, at least to an approximate extent.
+In the exploratory analysis, I will demonstrate how the following properties about the data hold true, at least to an approximate extent.
 
-- Each point is earned independently from each other.
-- The average time between points is constant throughout the game. The average differs between the teams.
-- The time between points follows an exponential distribution. The distribution differ between the teams.
+- **Independent points** : Each point is earned independently from the other points.
+- **Constant point rate** : The average time between points is constant throughout the game. The average differs between the teams.
+- **Exponentially distributed** : The time between points follows an exponential distribution. The distribution differs between the teams.
 
-We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear which suggests that, on average, the teams earn points at a constant rate.
+We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear which suggests that the teams earn points at a constant rate.
 
-```{r train-observed-score-plot, fig.cap = "Score progression for both teams as observed in the train dataset."}
+```{r train-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the train dataset."}
 tar_read(observed_score_plot)
 ```
 
-To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is pretty constant throughout the game.
+To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is pretty constant throughout the game. Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield in the start of the game.
 
-```{r train-observed-tbp-vs-score-plot, fig.cap = "Time between points (TBP) for each team as a function of score, as observed in the train dataset."}
+```{r train-observed-tbp-vs-score-plot, fig.cap = "Time between points (TBP) for each team as a function of score. As observed in the train dataset."}
 tar_read(observed_tbp_vs_score_plot)
 ```
 
-Still about the time between points, Figure \@ref(fig:train-observed-tbp) plots the estimated distribution for each team as observed in the train dataset. The estimated distributions have an exponential decay which favors an exponential distribution.
+Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) plots the estimated distribution for each team. The estimated distributions have an exponential decay which favors an exponential distribution.
 
-```{r train-observed-tbp, fig.cap = "Estimated TBP distribution for each team as observed in the train dataset."}
+```{r train-observed-tbp-plot, fig.cap = "Estimated TBP distribution for each team. As observed in the train dataset."}
 tar_read(observed_tbp_plot)
 ```
 
-Finally, to evaluate the independence between points, Figure BLAH.
+Finally, to evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows the TBP vs previous TBP for each team. There is not pattern besides the apparent downward trend, which can be fully explained by some properties of the exponential distribution. To demonstrate the spurious nature, Figure \@ref(fig:train-permuted-tbp-vs-lag-tbp-plot) shows the same data but with the TBP values shuffled. The process of shuffling imposes independence in the data but the same downward pattern persists. Therefore, the points can be reasonably assumed independent.
+
+```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset."}
+tar_read(observed_tbp_vs_lag_tbp_plot)
+```
+
+```{r train-permuted-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset with shuffled TBP."}
+tar_read(permuted_tbp_vs_lag_tbp_plot)
+```
 
 # Model
 
-Accounting for all the discoveries made in Section [Exploratory data analysis], I came up with the following model. It begins by assuming that each team has a different constant TBP rate, namely `point_rate[blue]` and `point_rate[red]`. This means that independently from team red and its own history, team blue will take $1 / \text{rate}^{\text{blue}}$ minutes on average to make the next point.
-
-It assumes that the time between points are sampled from an Exponential distribution with
+Accounting for all the discoveries made in the exploratory data analysis, I came up with the following bayesian model.
 
 ```R
-# Data
+# Part 1: Data
 point_time[blue][1], ..., point_time[blue][blue_last_score]
 point_time[red][1], ..., point_time[red][red_last_score]
 
-# Transformed data
+# Part 2: Transformed data
 tbp[blue][i] = point_time[blue][i] - point_time[blue][i - 1]
 tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
 
-# Prior
-max_score = 100
-max_time = 15
-mean_rate of rates = max_score / (2 / 3 * max_time)
+# Part 3: Prior
+MAX_SCORE = 100
+MAX_TIME = 15
+mean_rate_of_rates = MAX_SCORE / (2 / 3 * MAX_TIME)
 rate_of_rates = 1 / mean_rate_of_rates
 
-# Parameters
+# Part 4: Parameters
 point_rate[blue] ~ Exponential(rate_of_rates)
 point_rate[red] ~ Exponential(rate_of_rates)
 
-# Likelihood
+# Part 5: Likelihood
 tbp[blue][i] ~ Exponential(point_rate[blue])
 tbp[red][j] ~ Exponential(point_rate[red])
 ```
 
+Part 1 and 2 describe the given data, which is the time at which each point was earned by each team, and how to calculate the time between points from it. As for the other parts, it is easier to explain in a backward manner.
+
+Part 5 BLAH.
+
+Part 4 BLAH.
+
+Part 3 BLAH.
+
+<!--
+It begins by assuming that each team has a different point rate. Namely, `point_rate[blue]` and `point_rate[red]`. This means that independently from its own history and team red's history, team blue makes `point_rate[blue]` points per minute on average.
+
+Furthermore, the model assumes that, given the points rates, blah blah exponential distribution for TBP.
+
+Finally, the prior blah blah blah.
+-->
+
+<!-- Explain the thought process behind the prior value. That is, on average 10 minutes a game, cover games from blah to blah. Exponential distribution maximizes entropy-->
+
 # Prior model analysis
 
-Before fitting the model to the data, it is intesreting to selecet an appropriate prior. To do that, we can simulate data from the model using only the prior information. That is, without providing data. Figure \@ref(fig:prior-score-plot) summarizes the simulated data. It shows the score progression for a hypothetical team as simulated from the prior model.
+Before fitting the model to the data, it is interesting to check if the selected prior is appropriate. To do that, we can simulate data from the model using only the prior information. That is, without providing data to the model. Figure \@ref(fig:prior-score-plot) summarizes the simulated data. It shows the score progression for a hypothetical team as simulated from the prior model.
 
 ```{r}
 # tar_read(prior_model_rate_plot)
 ```
 
-```{r prior-score-plot, fig.cap = "Score progression for a hypothetical team as simulated from the prior model."}
+```{r prior-score-plot, fig.cap = "Score progression for a hypothetical team. As simulated from the prior model."}
 tar_read(prior_model_score_plot)
 ```
 

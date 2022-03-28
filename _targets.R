@@ -64,6 +64,14 @@ exploratory_analysis_targets <- list(
     tar_target(
         observed_tbp_vs_score_plot,
         plot_observed_tbp_vs_score(train_data)
+    ),
+    tar_target(
+        observed_tbp_vs_lag_tbp_plot,
+        plot_observed_tbp_vs_lag_tbp(train_data)
+    ),
+    tar_target(
+        permuted_tbp_vs_lag_tbp_plot,
+        plot_permuted_tbp_vs_lag_tbp(train_data)
     )
 )
 

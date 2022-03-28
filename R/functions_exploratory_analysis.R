@@ -57,3 +57,51 @@ plot_observed_tbp_vs_score <- function(
 
     return(plot)
 }
+
+plot_observed_tbp_vs_lag_tbp <- function(
+    data
+) {
+    plot <-
+        data %>%
+        rename(Team = team) %>%
+        ggplot(aes(x = lag(tbp), y = tbp)) +
+        geom_point() +
+        facet_grid(cols = vars(Team), labeller = label_both) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Lag time between points (minutes)",
+            y = "Time between points (minutes)"
+        )
+
+    return(plot)
+}
+
+plot_permuted_tbp_vs_lag_tbp <- function(
+    data
+) {
+    data <-
+        data %>%
+        drop_na(tbp) %>%
+        group_by(team) %>%
+        mutate(tbp = permute(tbp))
+
+    plot <-
+        data %>%
+        rename(Team = team) %>%
+        ggplot(aes(x = lag(tbp), y = tbp)) +
+        geom_point() +
+        facet_grid(cols = vars(Team), labeller = label_both) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Lag time between points (minutes)",
+            y = "Time between points (minutes)"
+        )
+
+    return(plot)
+}
+
+permute <- function(
+    x
+) {
+    sample(x)
+}
