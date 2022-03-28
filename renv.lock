@@ -400,9 +400,14 @@
     "cmdstanr": {
       "Package": "cmdstanr",
       "Version": "0.5.0",
-      "Source": "Repository",
-      "Repository": null,
-      "Hash": "299e5b110710c40356d1eccaec136696",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "stan-dev",
+      "RemoteRepo": "cmdstanr",
+      "RemoteRef": "master",
+      "RemoteSha": "4f67057d18ec59459f0a5cb2751bcc0b50ea5384",
+      "Hash": "7727145b0361eec8297fe63926a20f75",
       "Requirements": [
         "R6",
         "checkmate",
