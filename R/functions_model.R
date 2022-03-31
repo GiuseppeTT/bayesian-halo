@@ -52,10 +52,30 @@ fit_model <- function(
 table_model_rate <- function(
     model_fit
 ) {
-    model_fit %>%
-        spread_draws(rate[team]) %>%
-        median_hdci(rate)
-        return()
+    table <-
+        model_fit %>%
+        gather_draws(rate[team], rate_contrast) %>%
+        ungroup() %>%
+        mutate(rate = case_when(
+            .variable == "rate_contrast" ~ "Contrast",
+            TRUE ~ as.character(team)
+        ))
+
+    table <-
+        table %>%
+        mutate(rate = fct_relevel(
+            rate,
+            "Blue",
+            "Red",
+            "Contrast"
+        ))
+
+    table <-
+        table  %>%
+        group_by(rate) %>%
+        median_hdci(.value)
+
+    return(table)
 }
 
 table_model_contrast <- function(

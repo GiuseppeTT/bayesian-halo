@@ -25,3 +25,5 @@ SEED <- 42
 
 ALPHA <- 0.01
 FONT_SIZE <- 20
+
+DECIMALS <- 1

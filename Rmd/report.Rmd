@@ -23,6 +23,10 @@ library(gt)
 library(targets)
 ```
 
+```{r sources}
+source("R/constants.R")
+```
+
 # Too long, didn't read
 
 TODO.
@@ -168,7 +172,26 @@ tar_read(prior_model_score_plot)
 ## Train dataset
 
 ```{r}
-tar_read(train_model_rate_plot)
+tar_read(train_model_rate_table) %>%
+    select(
+        rate,
+        .value,
+        .lower,
+        .upper
+    ) %>%
+    gt(caption = "TODO") %>%
+    cols_align("left", where(is.factor)) %>%
+    fmt_number(where(is.numeric), decimals = DECIMALS) %>%
+    cols_merge(c(.lower, .upper),pattern = "[{1}, {2}]") %>%
+    cols_label(
+        rate = "Point rate",
+        .value = "Median",
+        .lower = "95% HDCI"
+    )
+```
+
+```{r}
+#tar_read(train_model_rate_plot)
 ```
 
 ```{r}
@@ -186,7 +209,26 @@ tar_read(train_model_score_plot)
 ## Test dataset
 
 ```{r}
-tar_read(test_model_rate_plot)
+tar_read(test_model_rate_table) %>%
+    select(
+        rate,
+        .value,
+        .lower,
+        .upper
+    ) %>%
+    gt(caption = "TODO") %>%
+    cols_align("left", where(is.factor)) %>%
+    fmt_number(where(is.numeric), decimals = DECIMALS) %>%
+    cols_merge(c(.lower, .upper),pattern = "[{1}, {2}]") %>%
+    cols_label(
+        rate = "Point rate",
+        .value = "Median",
+        .lower = "95% HDCI"
+    )
+```
+
+```{r}
+# tar_read(test_model_rate_plot)
 ```
 
 ```{r}
