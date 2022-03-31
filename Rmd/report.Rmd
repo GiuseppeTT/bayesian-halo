@@ -31,7 +31,7 @@ TODO.
 
 If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/games/halo-infinite) a lot in the past weeks. One game mode that I particularly like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other in a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game. If no team hits 100 points by the 15 minutes mark, the team with the biggest score wins.
 
-Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning given the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question my work sets to answer using bayesian statistics.
+Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning given the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question that my work sets to answer using bayesian statistics.
 
 <!--
     The report is divided into sections. Section [Dataset] describes the dataset used and Section [Exploratory data analysis] presents an exploratory analysis of its content to understand statistical properties of the game data. Based on this exploratory analysis, Section [Model] defines a Bayesian model for the data and Section [Prior model analysis] shows a synthetic dataset for the given prior values. Finally, Section [Results] shows the results obtained when fitting the model to the full data and [Conclusion] finishes the report with the final conclusions.
@@ -53,9 +53,11 @@ Due to the way the data was recorded, there are a few concerns which could not b
 - The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point. Besides, there are times in which the scoreboard is not visible or is only partially visible which might have impacted the annotated data.
 - The maximum time resolution is 1 second as it is constrained by the in-game time resolution, obtained from the scoreboard timer.
 
+All things considered, that data should be enough for developing a proof of concept.
+
 # Exploratory data analysis
 
-In the exploratory analysis, I will demonstrate how the following properties about the data hold true, at least to an approximate extent.
+In the exploratory analysis, I demonstrate how the following properties about the data hold true, at least to an approximate extent.
 
 - **Independent points** : Each point is earned independently from the other points.
 - **Constant point rate** : The average time between points is constant throughout the game. The average differs between the teams.
@@ -67,7 +69,11 @@ We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which sum
 tar_read(observed_score_plot)
 ```
 
-To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is pretty constant throughout the game. Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield in the start of the game.
+To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is constant throughout the game.
+
+<!--
+Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield in the start of the game.
+-->
 
 ```{r train-observed-tbp-vs-score-plot, fig.cap = "Time between points (TBP) for each team as a function of score. As observed in the train dataset."}
 tar_read(observed_tbp_vs_score_plot)
@@ -79,15 +85,17 @@ Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) p
 tar_read(observed_tbp_plot)
 ```
 
-Finally, to evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows the TBP vs previous TBP for each team. There is not pattern besides the apparent downward trend, which can be fully explained by some properties of the exponential distribution. To demonstrate the spurious nature, Figure \@ref(fig:train-permuted-tbp-vs-lag-tbp-plot) shows the same data but with the TBP values shuffled. The process of shuffling imposes independence in the data but the same downward pattern persists. Therefore, the points can be reasonably assumed independent.
+To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows the TBP vs previous TBP for each team. Taking into account the estimation error, the regression line is reasonably constant. This means that there is little dependence between points in each tam.
 
 ```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset."}
 tar_read(observed_tbp_vs_lag_tbp_plot)
 ```
 
 ```{r train-permuted-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset with shuffled TBP."}
-tar_read(permuted_tbp_vs_lag_tbp_plot)
+# tar_read(permuted_tbp_vs_lag_tbp_plot)
 ```
+
+Finally, look at the relation between the teams to inspect for any correlaction between them. Figure BLAH.
 
 # Model
 
