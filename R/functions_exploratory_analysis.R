@@ -49,6 +49,7 @@ plot_observed_tbp_vs_score <- function(
         geom_smooth(size = 2) +
         facet_grid(cols = vars(Team), labeller = label_both) +
         scale_x_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
+        scale_y_log10() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Score",
@@ -66,7 +67,10 @@ plot_observed_tbp_vs_lag_tbp <- function(
         rename(Team = team) %>%
         ggplot(aes(x = lag(tbp), y = tbp)) +
         geom_point() +
+        geom_smooth() +
         facet_grid(cols = vars(Team), labeller = label_both) +
+        scale_x_log10() +
+        scale_y_log10() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Lag time between points (minutes)",
@@ -90,7 +94,10 @@ plot_permuted_tbp_vs_lag_tbp <- function(
         rename(Team = team) %>%
         ggplot(aes(x = lag(tbp), y = tbp)) +
         geom_point() +
+        geom_smooth() +
         facet_grid(cols = vars(Team), labeller = label_both) +
+        scale_x_log10() +
+        scale_y_log10() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Lag time between points (minutes)",
