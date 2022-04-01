@@ -116,8 +116,8 @@ tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
 
 # Part 3: Prior
 MAX_SCORE = 100
-MAX_TIME = 15
-mean_rate_of_rates = MAX_SCORE / (2 / 3 * MAX_TIME)
+PRIOR_MEAN_TIME = 10
+mean_rate_of_rates = MAX_SCORE / PRIOR_MEAN_TIME
 rate_of_rates = 1 / mean_rate_of_rates
 
 # Part 4: Parameters
@@ -150,8 +150,8 @@ Part 3 summarizes my knowledge before the game even starts. My prior is that gam
 ```R
 # Part 3: Prior
 MAX_SCORE = 100
-MAX_TIME = 15
-mean_rate_of_rates = MAX_SCORE / (2 / 3 * MAX_TIME)
+PRIOR_MEAN_TIME = 10
+mean_rate_of_rates = MAX_SCORE / PRIOR_MEAN_TIME
 rate_of_rates = 1 / mean_rate_of_rates
 ```
 
