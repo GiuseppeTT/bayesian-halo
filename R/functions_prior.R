@@ -123,7 +123,7 @@ plot_prior_model_tbp_vs_score <- function(
     plot <-
         draws %>%
         ggplot(aes(x = score, y = tbp, group = .draw)) +
-        geom_smooth(se = FALSE, color = alpha("black", ALPHA)) +
+        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), se = FALSE, color = alpha("black", ALPHA)) +
         coord_cartesian(xlim = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
         scale_y_log10() +
         theme_minimal(FONT_SIZE) +

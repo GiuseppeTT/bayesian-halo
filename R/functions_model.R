@@ -205,7 +205,7 @@ plot_model_tbp_vs_score <- function(
         draws %>%
         rename(Team = team) %>%
         ggplot(aes(x = predicted_score, y = predicted_tbp, group = str_c(.draw, Team))) +
-        geom_smooth(se = FALSE, color = alpha("black", ALPHA)) +
+        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), se = FALSE, color = alpha("black", ALPHA)) +
         facet_grid(cols = vars(Team), labeller = label_both) +
         scale_x_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
         theme_minimal(FONT_SIZE) +

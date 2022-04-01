@@ -33,9 +33,9 @@ TODO.
 
 # Introduction
 
-If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/games/halo-infinite) a lot in the past weeks. One game mode that I particularly like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other in a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game. If no team hits 100 points by the 15 minutes mark, the team with the biggest score wins.
+If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/games/halo-infinite) a lot in the past weeks. One game mode that I particularly like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other on a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game. If no team hits 100 points by the 15 minutes mark, the team with the biggest score wins.
 
-Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning given the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question that my work sets to answer using bayesian statistics.
+Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning given the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question that my work sets out to answer using bayesian statistics.
 
 <!--
     The report is divided into sections. Section [Dataset] describes the dataset used and Section [Exploratory data analysis] presents an exploratory analysis of its content to understand statistical properties of the game data. Based on this exploratory analysis, Section [Model] defines a Bayesian model for the data and Section [Prior model analysis] shows a synthetic dataset for the given prior values. Finally, Section [Results] shows the results obtained when fitting the model to the full data and [Conclusion] finishes the report with the final conclusions.
@@ -67,7 +67,7 @@ In the exploratory analysis, I demonstrate how the following properties about th
 - **Constant point rate** : The average time between points is constant throughout the game. The average differs between the teams.
 - **Exponentially distributed** : The time between points follows an exponential distribution. The distribution differs between the teams.
 
-We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear which suggests that the teams earn points at a constant rate.
+We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear, which suggests that the teams earn points at a constant rate.
 
 ```{r train-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the train dataset."}
 tar_read(observed_score_plot)
@@ -76,7 +76,7 @@ tar_read(observed_score_plot)
 To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is constant throughout the game.
 
 <!--
-Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield in the start of the game.
+Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield at the start of the game.
 -->
 
 ```{r train-observed-tbp-vs-score-plot, fig.cap = "Time between points (TBP) for each team as a function of score. As observed in the train dataset."}
@@ -89,7 +89,7 @@ Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) p
 tar_read(observed_tbp_plot)
 ```
 
-To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows the TBP vs previous TBP for each team. Taking into account the estimation error, the regression line is reasonably constant. This means that there is little dependence between points in each tam.
+To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows the TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is little dependence between points in each team.
 
 ```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset."}
 tar_read(observed_tbp_vs_lag_tbp_plot)
@@ -99,7 +99,7 @@ tar_read(observed_tbp_vs_lag_tbp_plot)
 # tar_read(permuted_tbp_vs_lag_tbp_plot)
 ```
 
-Finally, look at the relation between the teams to inspect for any correlaction between them. Figure BLAH.
+Finally, we take a look at the relation between the teams to inspect for any correlation between them. Figure BLAH.
 
 # Model
 
@@ -129,27 +129,53 @@ tbp[blue][i] ~ Exponential(point_rate[blue])
 tbp[red][j] ~ Exponential(point_rate[red])
 ```
 
-Part 1 and 2 describe the given data, which is the time at which each point was earned by each team, and how to calculate the time between points from it. As for the other parts, it is easier to explain in a backward manner.
+Part 1 describes the input data, which is the time at which the teams scored each point. For instance, `point_time[blue][5]` is the time point of the game in which the blue team scored its 5th point.
 
-Part 5 BLAH.
+```R
+# Part 1: Data
+point_time[blue][1], ..., point_time[blue][blue_last_score]
+point_time[red][1], ..., point_time[red][red_last_score]
+```
 
-Part 4 BLAH.
+Part 2 shows how to calculate TBP from the given data. For example, `tbp[red][4]` is the amount of time that elapsed between the 3rd and 4th points of team red. It is obtained by simply subtracting `point_time[red][3]` from `point_time[red][4]`.
 
-Part 3 BLAH.
+```R
+# Part 2: Transformed data
+tbp[blue][i] = point_time[blue][i] - point_time[blue][i - 1]
+tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
+```
 
-<!--
-It begins by assuming that each team has a different point rate. Namely, `point_rate[blue]` and `point_rate[red]`. This means that independently from its own history and team red's history, team blue makes `point_rate[blue]` points per minute on average.
+Part 3 summarizes my knowledge before the game even starts. My prior is that games take on average 10 out of 15 minutes to finish. On top of that, using an exponential distribution as a prior guarantees that the final model is not too restricted. For instance, the selected prior allows for games that last from `r round(100 / qexp(1 - 0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` to `r round(100 / qexp(0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` minutes (if it were possible).
 
-Furthermore, the model assumes that, given the points rates, blah blah exponential distribution for TBP.
+```R
+# Part 3: Prior
+MAX_SCORE = 100
+MAX_TIME = 15
+mean_rate_of_rates = MAX_SCORE / (2 / 3 * MAX_TIME)
+rate_of_rates = 1 / mean_rate_of_rates
+```
 
-Finally, the prior blah blah blah.
--->
+Part 4 explains how the parameters are sampled from the prior. Here, `point_rate[blue]` is the point rate from the blue team and measures how many points team blue makes per minute on average.
 
-<!-- Explain the thought process behind the prior value. That is, on average 10 minutes a game, cover games from blah to blah. Exponential distribution maximizes entropy-->
+```R
+# Part 4: Parameters
+point_rate[blue] ~ Exponential(rate_of_rates)
+point_rate[red] ~ Exponential(rate_of_rates)
+```
+
+Lasterly part 5 states that TBP follows an exponential distribution with the specified parameters. More importantly, each point is assumed to be independent from the others.
+
+```R
+# Part 5: Likelihood
+tbp[blue][i] ~ Exponential(point_rate[blue])
+tbp[red][j] ~ Exponential(point_rate[red])
+```
 
 # Prior model analysis
 
 Before fitting the model to the data, it is interesting to check if the selected prior is appropriate. To do that, we can simulate data from the model using only the prior information. That is, without providing data to the model. Figure \@ref(fig:prior-score-plot) summarizes the simulated data. It shows the score progression for a hypothetical team as simulated from the prior model.
+
+As it can be seen, the models allow for a wide range of score progressions. The only restriction is that the trajectories should be linear.
 
 ```{r}
 # tar_read(prior_model_rate_plot)
