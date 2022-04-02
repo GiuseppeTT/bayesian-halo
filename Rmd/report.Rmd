@@ -39,10 +39,6 @@ If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/g
 
 Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning given the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question that my work sets out to answer using bayesian statistics.
 
-<!--
-    The report is divided into sections. Section [Dataset] describes the dataset used and Section [Exploratory data analysis] presents an exploratory analysis of its content to understand statistical properties of the game data. Based on this exploratory analysis, Section [Model] defines a Bayesian model for the data and Section [Prior model analysis] shows a synthetic dataset for the given prior values. Finally, Section [Results] shows the results obtained when fitting the model to the full data and [Conclusion] finishes the report with the final conclusions.
--->
-
 # Dataset
 
 To answer the question proposed, I selected two matches of Halo BTBS from YouTube and manually filled two spreadsheets with game statistics. The first game is available at https://youtu.be/cANMWiYTD84 and defines the train dataset. It was used to gain some quantitative knowledge about this type of data, propose a model and check valid values for a prior distribution. The second game is available at https://youtu.be/kuH9nhdzt64 and defines the test dataset. It was used to fit the proposed model in a novel dataset to check the model's performance.
@@ -95,10 +91,6 @@ To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp
 
 ```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset."}
 tar_read(observed_tbp_vs_lag_tbp_plot)
-```
-
-```{r train-permuted-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset with shuffled TBP."}
-# tar_read(permuted_tbp_vs_lag_tbp_plot)
 ```
 
 Finally, we take a look at the relation between the teams to inspect for any correlation between them. Figure \@ref(fig:train-observed-window-mean-tbp) shows the average TBP for every `r WINDOW_SIZE` seconds between team blue and red. The horizontal regression line evidentiates that team red has no influence at team blue's point rate and vice versa.
@@ -183,20 +175,8 @@ Before fitting the model to the data, it is interesting to check if the selected
 
 As it can be seen, the models allow for a wide range of score progressions. The only restriction is that the trajectories should be linear.
 
-```{r}
-# tar_read(prior_model_rate_plot)
-```
-
 ```{r prior-score-plot, fig.cap = "Score progression for a hypothetical team. As simulated from the prior model."}
 tar_read(prior_model_score_plot)
-```
-
-```{r}
-# tar_read(prior_model_tbp_vs_score_plot)
-```
-
-```{r}
-# tar_read(prior_model_tbp_plot)
 ```
 
 # Results
@@ -223,19 +203,7 @@ tar_read(train_model_rate_table) %>%
 ```
 
 ```{r}
-#tar_read(train_model_rate_plot)
-```
-
-```{r}
 tar_read(train_model_score_plot)
-```
-
-```{r}
-# tar_read(train_model_tbp_vs_score_plot)
-```
-
-```{r}
-# tar_read(train_model_tbp_plot)
 ```
 
 ## Test dataset
@@ -260,19 +228,7 @@ tar_read(test_model_rate_table) %>%
 ```
 
 ```{r}
-# tar_read(test_model_rate_plot)
-```
-
-```{r}
 tar_read(test_model_score_plot)
-```
-
-```{r}
-# tar_read(test_model_tbp_vs_score_plot)
-```
-
-```{r}
-# tar_read(test_model_tbp_plot)
 ```
 
 # Conclusion

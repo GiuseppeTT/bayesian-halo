@@ -58,24 +58,20 @@ exploratory_analysis_targets <- list(
         plot_observed_score(train_data)
     ),
     tar_target(
-        observed_tbp_plot,
-        plot_observed_tbp(train_data)
-    ),
-    tar_target(
         observed_tbp_vs_score_plot,
         plot_observed_tbp_vs_score(train_data)
+    ),
+    tar_target(
+        observed_tbp_plot,
+        plot_observed_tbp(train_data)
     ),
     tar_target(
         observed_tbp_vs_lag_tbp_plot,
         plot_observed_tbp_vs_lag_tbp(train_data)
     ),
     tar_target(
-        permuted_tbp_vs_lag_tbp_plot,
-        plot_permuted_tbp_vs_lag_tbp(train_data)
-    ),
-    tar_target(
         window_mean_tbp_plot,
-        plot_window_mean_tbp(train_data, window_size = WINDOW_SIZE)
+        plot_observed_window_mean_tbp(train_data, window_size = WINDOW_SIZE)
     )
 )
 
@@ -97,24 +93,8 @@ prior_targets <- list(
         fit_prior_model(prior_model, prior_model_data)
     ),
     tar_target(
-        prior_model_rate_table,
-        table_prior_model_rate(prior_model_fit)
-    ),
-    tar_target(
-        prior_model_rate_plot,
-        plot_prior_model_rate(prior_model_fit)
-    ),
-    tar_target(
         prior_model_score_plot,
         plot_prior_model_score(prior_model_fit)
-    ),
-    tar_target(
-        prior_model_tbp_plot,
-        plot_prior_model_tbp(prior_model_fit)
-    ),
-    tar_target(
-        prior_model_tbp_vs_score_plot,
-        plot_prior_model_tbp_vs_score(prior_model_fit)
     )
 )
 
@@ -140,20 +120,8 @@ train_model_targets <- list(
         table_model_rate(train_model_fit)
     ),
     tar_target(
-        train_model_rate_plot,
-        plot_model_rate(train_model_fit)
-    ),
-    tar_target(
         train_model_score_plot,
         plot_model_score(train_model_fit, train_data)
-    ),
-    tar_target(
-        train_model_tbp_plot,
-        plot_model_tbp(train_model_fit, train_data)
-    ),
-    tar_target(
-        train_model_tbp_vs_score_plot,
-        plot_model_tbp_vs_score(train_model_fit, train_data)
     )
 )
 
@@ -206,20 +174,8 @@ test_model_targets <- list(
         table_model_rate(test_model_fit)
     ),
     tar_target(
-        test_model_rate_plot,
-        plot_model_rate(test_model_fit)
-    ),
-    tar_target(
         test_model_score_plot,
         plot_model_score(test_model_fit, test_data)
-    ),
-    tar_target(
-        test_model_tbp_plot,
-        plot_model_tbp(test_model_fit, test_data)
-    ),
-    tar_target(
-        test_model_tbp_vs_score_plot,
-        plot_model_tbp_vs_score(test_model_fit, test_data)
     )
 )
 

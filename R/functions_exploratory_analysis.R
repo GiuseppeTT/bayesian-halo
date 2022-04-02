@@ -20,24 +20,6 @@ plot_observed_score <- function(
     return(plot)
 }
 
-plot_observed_tbp <- function(
-    data
-) {
-    plot <-
-        data %>%
-        ggplot(aes(x = tbp, color = team)) +
-        geom_density(size = 2) +
-        scale_color_viridis_d() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Time between points (minutes)",
-            y = "Density",
-            color = "Team"
-        )
-
-    return(plot)
-}
-
 plot_observed_tbp_vs_score <- function(
     data
 ) {
@@ -54,6 +36,24 @@ plot_observed_tbp_vs_score <- function(
         labs(
             x = "Score",
             y = "Time between points (minutes)"
+        )
+
+    return(plot)
+}
+
+plot_observed_tbp <- function(
+    data
+) {
+    plot <-
+        data %>%
+        ggplot(aes(x = tbp, color = team)) +
+        geom_density(size = 2) +
+        scale_color_viridis_d() +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Time between points (minutes)",
+            y = "Density",
+            color = "Team"
         )
 
     return(plot)
@@ -80,40 +80,7 @@ plot_observed_tbp_vs_lag_tbp <- function(
     return(plot)
 }
 
-plot_permuted_tbp_vs_lag_tbp <- function(
-    data
-) {
-    data <-
-        data %>%
-        drop_na(tbp) %>%
-        group_by(team) %>%
-        mutate(tbp = permute(tbp))
-
-    plot <-
-        data %>%
-        rename(Team = team) %>%
-        ggplot(aes(x = lag(tbp), y = tbp)) +
-        geom_point() +
-        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), size = 2) +
-        facet_grid(cols = vars(Team), labeller = label_both) +
-        scale_x_log10() +
-        scale_y_log10() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Lag time between points (minutes)",
-            y = "Time between points (minutes)"
-        )
-
-    return(plot)
-}
-
-permute <- function(
-    x
-) {
-    sample(x)
-}
-
-plot_window_mean_tbp <- function(
+plot_observed_window_mean_tbp <- function(
     data,
     window_size  # In seconds
 ) {

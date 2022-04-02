@@ -39,36 +39,6 @@ fit_prior_model <- function(
     return(prior_model_fit)
 }
 
-table_prior_model_rate <- function(
-    prior_model_fit
-) {
-    prior_model_fit %>%
-        spread_draws(rate) %>%
-        median_hdci(rate) %>%
-        return()
-}
-
-plot_prior_model_rate <- function(
-    prior_model_fit
-) {
-    draws <-
-        prior_model_fit %>%
-        spread_draws(rate)
-
-    plot <-
-        draws %>%
-        ggplot(aes(x = "Rate", y = rate)) +
-        stat_pointinterval(point_interval = "median_hdci") +
-        coord_flip() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = NULL,
-            y = "Rate"
-        )
-
-    return(plot)
-}
-
 plot_prior_model_score <- function(
     prior_model_fit
 ) {
@@ -87,49 +57,6 @@ plot_prior_model_score <- function(
             x = "Time (minutes)",
             y = "Score",
             color = "Team"
-        )
-
-    return(plot)
-}
-
-plot_prior_model_tbp <- function(
-    prior_model_fit
-) {
-    draws <-
-        prior_model_fit %>%
-        spread_draws(tbp[t])
-
-    plot <-
-        draws %>%
-        ggplot(aes(x = tbp, group = .draw)) +
-        geom_density(color = alpha("black", ALPHA)) +
-        scale_x_log10() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Time between points (minutes)",
-            y = "Density"
-        )
-
-    return(plot)
-}
-
-plot_prior_model_tbp_vs_score <- function(
-    prior_model_fit
-) {
-    draws <-
-        prior_model_fit %>%
-        spread_draws(score[t], tbp[t])
-
-    plot <-
-        draws %>%
-        ggplot(aes(x = score, y = tbp, group = .draw)) +
-        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), se = FALSE, color = alpha("black", ALPHA)) +
-        coord_cartesian(xlim = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
-        scale_y_log10() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Score",
-            y = "Time between points (minutes)"
         )
 
     return(plot)
