@@ -112,3 +112,32 @@ permute <- function(
 ) {
     sample(x)
 }
+
+plot_window_mean_tbp <- function(
+    data,
+    window_size  # In seconds
+) {
+    data <-
+        data %>%
+        mutate(time = floor(time * 60 / window_size)) %>%
+        group_by(team, time) %>%
+        summarise(mean = mean(tbp)) %>%
+        ungroup()
+
+    data <-
+        data %>%
+        pivot_wider(names_from = "team", values_from = "mean")
+
+    plot <-
+        data %>%
+        ggplot(aes(x = Red, y = Blue)) +
+        geom_point() +
+        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), size = 2) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "Red time between points (minutes)",
+            y = "Blue time between points (minutes)"
+        )
+
+    return(plot)
+}

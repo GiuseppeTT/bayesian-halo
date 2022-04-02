@@ -72,6 +72,10 @@ exploratory_analysis_targets <- list(
     tar_target(
         permuted_tbp_vs_lag_tbp_plot,
         plot_permuted_tbp_vs_lag_tbp(train_data)
+    ),
+    tar_target(
+        window_mean_tbp_plot,
+        plot_window_mean_tbp(train_data, window_size = WINDOW_SIZE)
     )
 )
 

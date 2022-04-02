@@ -53,7 +53,7 @@ Each dataset is composed of three variables (columns). They are:
 
 Due to the way the data was recorded, there are a few concerns which could not be addressed. They are:
 
-- The data was extracted from a gameplay available at YouTube and, therefore, might not be representative. This is because people tend to publish only games where they (and therefore their team) had a good performance.
+- The data was extracted from a gameplay available at YouTube and, therefore, might not be representative. This is because people tend to publish only games where they had a good performance.
 - The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point. Besides, there are times in which the scoreboard is not visible or is only partially visible which might have impacted the annotated data.
 - The maximum time resolution is 1 second as it is constrained by the in-game time resolution, obtained from the scoreboard timer.
 
@@ -64,7 +64,7 @@ All things considered, that data should be enough for developing a proof of conc
 In the exploratory analysis, I demonstrate how the following properties about the data hold true, at least to an approximate extent.
 
 - **Independent points** : Each point is earned independently from the other points.
-- **Constant point rate** : The average time between points is constant throughout the game. The average differs between the teams.
+- **Constant average** : The average time between points is constant throughout the game. The average differs between the teams.
 - **Exponentially distributed** : The time between points follows an exponential distribution. The distribution differs between the teams.
 
 We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear, which suggests that the teams earn points at a constant rate.
@@ -73,7 +73,7 @@ We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which sum
 tar_read(observed_score_plot)
 ```
 
-To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is constant throughout the game.
+To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is constant throughout the game. This fact confirms the constant point rate.
 
 <!--
 Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield at the start of the game.
@@ -89,7 +89,7 @@ Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) p
 tar_read(observed_tbp_plot)
 ```
 
-To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows the TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is little dependence between points in each team.
+To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is no dependence between points in each team.
 
 ```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset."}
 tar_read(observed_tbp_vs_lag_tbp_plot)
@@ -99,7 +99,11 @@ tar_read(observed_tbp_vs_lag_tbp_plot)
 # tar_read(permuted_tbp_vs_lag_tbp_plot)
 ```
 
-Finally, we take a look at the relation between the teams to inspect for any correlation between them. Figure BLAH.
+Finally, we take a look at the relation between the teams to inspect for any correlation between them. Figure \@ref(fig:train-observed-window-mean-tbp) shows the average TBP for every `r WINDOW_SIZE` seconds between team blue and red. The horizontal regression line evidentiates that team red has no influence at team blue's point rate and vice versa.
+
+```{r train-observed-window-mean-tbp, fig.cap = "Mean time between points (TBP) for team blue vs team red. Windows size is 15 seconds. As observed in the train dataset."}
+tar_read(window_mean_tbp_plot)
+```
 
 # Model
 
@@ -129,7 +133,7 @@ tbp[blue][i] ~ Exponential(point_rate[blue])
 tbp[red][j] ~ Exponential(point_rate[red])
 ```
 
-Part 1 describes the input data, which is the time at which the teams scored each point. For instance, `point_time[blue][5]` is the time point of the game in which the blue team scored its 5th point.
+Part 1 describes the input data, which is the time at which the teams scored each point. For instance, `point_time[blue][5]` is the time point in which the blue team scored its 5th point.
 
 ```R
 # Part 1: Data
@@ -137,7 +141,7 @@ point_time[blue][1], ..., point_time[blue][blue_last_score]
 point_time[red][1], ..., point_time[red][red_last_score]
 ```
 
-Part 2 shows how to calculate TBP from the given data. For example, `tbp[red][4]` is the amount of time that elapsed between the 3rd and 4th points of team red. It is obtained by simply subtracting `point_time[red][3]` from `point_time[red][4]`.
+Part 2 shows how to calculate TBP from the given data. For example, `tbp[red][4]` is the amount of time that elapsed between the 3rd and 4th point of team red. It is obtained by simply subtracting `point_time[red][3]` from `point_time[red][4]`.
 
 ```R
 # Part 2: Transformed data
@@ -145,7 +149,7 @@ tbp[blue][i] = point_time[blue][i] - point_time[blue][i - 1]
 tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
 ```
 
-Part 3 summarizes my knowledge before the game even starts. My prior is that games take on average 10 out of 15 minutes to finish. On top of that, using an exponential distribution as a prior guarantees that the final model is not too restricted. For instance, the selected prior allows for games that last from `r round(100 / qexp(1 - 0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` to `r round(100 / qexp(0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` minutes (if it were possible).
+Part 3 summarizes my knowledge before the game even starts. My prior is that teams take on average 10 minutes to get 100 points. On top of that, using an exponential distribution as a prior guarantees that the final model is not too restricted. For instance, the selected prior allows for teams to take from `r round(100 / qexp(1 - 0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` to `r round(100 / qexp(0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` minutes to achieve 100 points.
 
 ```R
 # Part 3: Prior
@@ -163,7 +167,7 @@ point_rate[blue] ~ Exponential(rate_of_rates)
 point_rate[red] ~ Exponential(rate_of_rates)
 ```
 
-Lasterly part 5 states that TBP follows an exponential distribution with the specified parameters. More importantly, each point is assumed to be independent from the others.
+Lastly part 5 states that TBP follows an exponential distribution with the specified parameters. More importantly, each point is assumed to be independent from the others.
 
 ```R
 # Part 5: Likelihood
@@ -205,7 +209,7 @@ tar_read(train_model_rate_table) %>%
         .lower,
         .upper
     ) %>%
-    gt(caption = "TODO") %>%
+    gt(caption = "Posterior estimate results for the train data.") %>%
     cols_align("left", where(is.factor)) %>%
     fmt_number(where(is.numeric), decimals = DECIMALS) %>%
     cols_merge(c(.lower, .upper),pattern = "[{1}, {2}]") %>%
@@ -242,7 +246,7 @@ tar_read(test_model_rate_table) %>%
         .lower,
         .upper
     ) %>%
-    gt(caption = "TODO") %>%
+    gt(caption = "Posterior estimate results for the test data.") %>%
     cols_align("left", where(is.factor)) %>%
     fmt_number(where(is.numeric), decimals = DECIMALS) %>%
     cols_merge(c(.lower, .upper),pattern = "[{1}, {2}]") %>%
