@@ -79,7 +79,7 @@ clean_data <- function(
     data <-
         data %>%
         group_by(team) %>%
-        mutate(ttp = time - lag(time)) %>%
+        mutate(tbp = time - lag(time)) %>%
         ungroup()
 
     return(data)

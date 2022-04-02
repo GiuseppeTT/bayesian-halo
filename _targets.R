@@ -58,12 +58,24 @@ exploratory_analysis_targets <- list(
         plot_observed_score(train_data)
     ),
     tar_target(
-        observed_ttp_plot,
-        plot_observed_ttp(train_data)
+        observed_tbp_plot,
+        plot_observed_tbp(train_data)
     ),
     tar_target(
-        observed_ttp_vs_score_plot,
-        plot_observed_ttp_vs_score(train_data)
+        observed_tbp_vs_score_plot,
+        plot_observed_tbp_vs_score(train_data)
+    ),
+    tar_target(
+        observed_tbp_vs_lag_tbp_plot,
+        plot_observed_tbp_vs_lag_tbp(train_data)
+    ),
+    tar_target(
+        permuted_tbp_vs_lag_tbp_plot,
+        plot_permuted_tbp_vs_lag_tbp(train_data)
+    ),
+    tar_target(
+        window_mean_tbp_plot,
+        plot_window_mean_tbp(train_data, window_size = WINDOW_SIZE)
     )
 )
 
@@ -97,12 +109,51 @@ prior_targets <- list(
         plot_prior_model_score(prior_model_fit)
     ),
     tar_target(
-        prior_model_ttp_plot,
-        plot_prior_model_ttp(prior_model_fit)
+        prior_model_tbp_plot,
+        plot_prior_model_tbp(prior_model_fit)
     ),
     tar_target(
-        prior_model_ttp_vs_score_plot,
-        plot_prior_model_ttp_vs_score(prior_model_fit)
+        prior_model_tbp_vs_score_plot,
+        plot_prior_model_tbp_vs_score(prior_model_fit)
+    )
+)
+
+train_model_targets <- list(
+    tar_file(
+        train_model_path,
+        MODEL_PATH
+    ),
+    tar_target(
+        train_model,
+        create_model(train_model_path)
+    ),
+    tar_target(
+        train_model_data,
+        create_model_data(train_data)
+    ),
+    tar_target(
+        train_model_fit,
+        fit_model(train_model, train_model_data, train_data)
+    ),
+    tar_target(
+        train_model_rate_table,
+        table_model_rate(train_model_fit)
+    ),
+    tar_target(
+        train_model_rate_plot,
+        plot_model_rate(train_model_fit)
+    ),
+    tar_target(
+        train_model_score_plot,
+        plot_model_score(train_model_fit, train_data)
+    ),
+    tar_target(
+        train_model_tbp_plot,
+        plot_model_tbp(train_model_fit, train_data)
+    ),
+    tar_target(
+        train_model_tbp_vs_score_plot,
+        plot_model_tbp_vs_score(train_model_fit, train_data)
     )
 )
 
@@ -133,50 +184,42 @@ test_data_targets <- list(
     )
 )
 
-model_targets <- list(
+test_model_targets <- list(
     tar_file(
-        model_path,
+        test_model_path,
         MODEL_PATH
     ),
     tar_target(
-        model,
-        create_model(model_path)
+        test_model,
+        create_model(test_model_path)
     ),
     tar_target(
-        model_data,
+        test_model_data,
         create_model_data(test_data)
     ),
     tar_target(
-        model_fit,
-        fit_model(model, model_data, test_data)
+        test_model_fit,
+        fit_model(test_model, test_model_data, test_data)
     ),
     tar_target(
-        model_rate_table,
-        table_model_rate(model_fit)
+        test_model_rate_table,
+        table_model_rate(test_model_fit)
     ),
     tar_target(
-        model_contrast_table,
-        table_model_contrast(model_fit)
+        test_model_rate_plot,
+        plot_model_rate(test_model_fit)
     ),
     tar_target(
-        model_rate_plot,
-        plot_model_rate(model_fit)
+        test_model_score_plot,
+        plot_model_score(test_model_fit, test_data)
     ),
     tar_target(
-        model_contrast_plot,
-        plot_model_contrast(model_fit)
+        test_model_tbp_plot,
+        plot_model_tbp(test_model_fit, test_data)
     ),
     tar_target(
-        model_score_plot,
-        plot_model_score(model_fit, test_data)
-    ),
-    tar_target(
-        model_ttp_plot,
-        plot_model_ttp(model_fit, test_data)
-    ),
-    tar_target(
-        model_ttp_vs_score_plot,
-        plot_model_ttp_vs_score(model_fit, test_data)
+        test_model_tbp_vs_score_plot,
+        plot_model_tbp_vs_score(test_model_fit, test_data)
     )
 )
 
@@ -192,8 +235,9 @@ targets <- c(
     train_data_targets,
     exploratory_analysis_targets,
     prior_targets,
+    train_model_targets,
     test_data_targets,
-    model_targets,
+    test_model_targets,
     report_targets
 )
 

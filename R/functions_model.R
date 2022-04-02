@@ -52,10 +52,30 @@ fit_model <- function(
 table_model_rate <- function(
     model_fit
 ) {
-    model_fit %>%
-        spread_draws(rate[team]) %>%
-        median_hdci(rate)
-        return()
+    table <-
+        model_fit %>%
+        gather_draws(rate[team], rate_contrast) %>%
+        ungroup() %>%
+        mutate(rate = case_when(
+            .variable == "rate_contrast" ~ "Contrast",
+            TRUE ~ as.character(team)
+        ))
+
+    table <-
+        table %>%
+        mutate(rate = fct_relevel(
+            rate,
+            "Blue",
+            "Red",
+            "Contrast"
+        ))
+
+    table <-
+        table  %>%
+        group_by(rate) %>%
+        median_hdci(.value)
+
+    return(table)
 }
 
 table_model_contrast <- function(
@@ -72,40 +92,38 @@ plot_model_rate <- function(
 ) {
     draws <-
         model_fit %>%
-        spread_draws(rate[team])
+        spread_draws(rate[team], rate_contrast)
 
-    plot <-
-        draws %>%
-        ggplot(aes(x = team, y = rate)) +
-        stat_pointinterval(point_interval = "median_hdci") +
-        scale_y_continuous(limits = c(0, NA)) +
-        coord_flip() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Team",
-            y = "Rate"
-        )
-
-    return(plot)
-}
-
-plot_model_contrast <- function(
-    model_fit
-) {
     draws <-
-        model_fit %>%
-        spread_draws(rate_contrast)
+        draws %>%
+        pivot_wider(names_from = "team", values_from = "rate") %>%
+        pivot_longer(
+            c(Blue, Red, rate_contrast),
+            names_to = "parameter",
+            values_to = "value"
+        ) %>%
+        mutate(parameter = fct_recode(
+            parameter,
+            "Blue's point rate" = "Blue",
+            "Red's point rate" = "Red",
+            "Rate contrast" = "rate_contrast"
+        )) %>%
+        mutate(parameter = fct_relevel(
+            parameter,
+            "Blue's point rate",
+            "Red's point rate",
+            "Rate contrast"
+        ))
 
     plot <-
         draws %>%
-        ggplot(aes(x = "Rate contrast", y = rate_contrast)) +
+        ggplot(aes(x = fct_rev(parameter), y = value)) +
         stat_pointinterval(point_interval = "median_hdci") +
-        geom_hline(yintercept = 0, color = "red", size = 2) +
         coord_flip() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = NULL,
-            y = "Rate"
+            y = NULL
         )
 
     return(plot)
@@ -145,26 +163,26 @@ plot_model_score <- function(
     return(plot)
 }
 
-plot_model_ttp <- function(
+plot_model_tbp <- function(
     model_fit,
     data
 ) {
     draws <-
         model_fit %>%
-        spread_draws(predicted_ttp[t]) %>%
+        spread_draws(predicted_tbp[t]) %>%
         sample_draws(POSTERIOR_PLOT_SAMPLE_COUNT) %>%
         ungroup() %>%
         recover_covariates(data, by = "t", team)
 
     plot <-
         draws %>%
-        ggplot(aes(x = predicted_ttp, color = team, group = str_c(.draw, team))) +
+        ggplot(aes(x = predicted_tbp, color = team, group = str_c(.draw, team))) +
         stat_density(geom = "line", position = "identity", alpha = ALPHA) +
         scale_x_log10() +
         scale_color_viridis_d() +
         theme_minimal(FONT_SIZE) +
         labs(
-            x = "Time to point (minutes)",
+            x = "Time between points (minutes)",
             y = "Density",
             color = "Team"
         )
@@ -172,13 +190,13 @@ plot_model_ttp <- function(
     return(plot)
 }
 
-plot_model_ttp_vs_score <- function(
+plot_model_tbp_vs_score <- function(
     model_fit,
     data
 ) {
     draws <-
         model_fit %>%
-        spread_draws(predicted_score[t], predicted_ttp[t]) %>%
+        spread_draws(predicted_score[t], predicted_tbp[t]) %>%
         sample_draws(POSTERIOR_PLOT_SAMPLE_COUNT) %>%
         ungroup() %>%
         recover_covariates(data, by = "t", team)
@@ -186,14 +204,14 @@ plot_model_ttp_vs_score <- function(
     plot <-
         draws %>%
         rename(Team = team) %>%
-        ggplot(aes(x = predicted_score, y = predicted_ttp, group = str_c(.draw, Team))) +
-        geom_smooth(se = FALSE, color = alpha("black", ALPHA)) +
+        ggplot(aes(x = predicted_score, y = predicted_tbp, group = str_c(.draw, Team))) +
+        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), se = FALSE, color = alpha("black", ALPHA)) +
         facet_grid(cols = vars(Team), labeller = label_both) +
         scale_x_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Score",
-            y = "Time to point (minutes)"
+            y = "Time between points (minutes)"
         )
 
     return(plot)
