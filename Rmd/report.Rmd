@@ -29,7 +29,9 @@ source("R/constants.R")
 
 # Too long, didn't read
 
-TODO.
+I used bayesian stats to model a match of Big Team Battle Slayer (BTBS). BTBS is a game mode of Halo Infinite in which 2 teams score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
+
+The model performed better than a linear regression at predicting the game progression. Moreover, the model can be easily used to estimate the probability of a team winning at each timepoint.
 
 # Introduction
 
