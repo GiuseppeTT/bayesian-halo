@@ -28,6 +28,8 @@ on:
     branches:
       - main
       - master
+  on:
+    pull_request
 
 name: targets
 
