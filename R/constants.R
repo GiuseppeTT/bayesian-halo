@@ -3,13 +3,12 @@
 RAW_TRAIN_DATA_PATH <- here::here("data/raw/train.csv")
 RAW_TEST_DATA_PATH <- here::here("data/raw/test.csv")
 
-STAN_OUTPUT_PATH <- here::here("stan_output")
+STAN_OUTPUT_PATH <- here::here("output/stan/")
 PRIOR_MODEL_PATH <- here::here("stan/prior_model.stan")
 MODEL_PATH <- here::here("stan/model.stan")
 
-RESULTS_PATH <- here::here("results/")
 REPORT_SOURCE_PATH <- here::here("Rmd/report.Rmd")
-REPORT_OUTPUT_PATH <- here::here("results/report.html")
+REPORT_OUTPUT_PATH <- here::here("output/github-pages/report.html")
 
 GAME_MIN_TIME <- 0
 GAME_MAX_TIME <- 15
