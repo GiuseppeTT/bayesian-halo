@@ -29,9 +29,11 @@ source("R/constants.R")
 
 # Too long, didn't read
 
-I used bayesian stats to model a match of Big Team Battle Slayer (BTBS). BTBS is a game mode of Halo Infinite in which 2 teams score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
+**Introduction:** I used bayesian stats to model a match of Big Team Battle Slayer (BTBS). BTBS is a game mode of Halo Infinite in which 2 teams score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
 
-The model performed better than a linear regression at predicting the game progression. Moreover, the model can be easily used to estimate the probability of a team winning at each timepoint.
+**Model and results:** The fit model showed a good fit to the data with test MSE TODO. Moreover, it provided some powerful insights such as credible intervals for the team point rates and the probability of team blue winning at any timepoint.
+
+**Conclusion:** Unfourtunately, the fit model performance was lower than simple accumulative average model which, along with other disadvatanges such as computational scale and math complexity make the final model less interesting for robust applications such the ones found in the industry.
 
 # Introduction
 
@@ -43,17 +45,21 @@ Now if you are really like me, you have also been wondering about how to statist
 
 To answer the question proposed, I selected two matches of Halo BTBS from YouTube and manually filled two spreadsheets with game statistics. The first game is available at https://youtu.be/cANMWiYTD84 and defines the train dataset. It was used to gain some quantitative knowledge about this type of data, propose a model and check valid values for a prior distribution. The second game is available at https://youtu.be/kuH9nhdzt64 and defines the test dataset. It was used to fit the proposed model in a novel dataset to check the model's performance.
 
-Each dataset is composed of three variables (columns). They are:
+Each dataset is composed of three variables (columns):
 
 - **time:** Time at which the score was recorded.
 - **blue:** Score of team blue at the time. Team blue is the team of the player who recorded the gameplay.
 - **red:** Score of team red at the time. Team red is the enemy team of the player who recorded the gameplay.
 
-Due to the way the data was recorded, there are a few concerns which could not be addressed. They are:
+Due to the way the data was recorded, there are a few concerns which could not be addressed:
 
 - The data was extracted from a gameplay available at YouTube and, therefore, might not be representative. This is because people tend to publish only games where they had a good performance.
-- The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point. Besides, there are times in which the scoreboard is not visible or is only partially visible which might have impacted the annotated data.
+- The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point.
 - The maximum time resolution is 1 second as it is constrained by the in-game time resolution, obtained from the scoreboard timer.
+
+<!--
+    Besides, there are times in which the scoreboard is not visible or is only partially visible which might have impacted the annotated data.
+-->
 
 All things considered, that data should be enough for developing a proof of concept.
 
@@ -71,31 +77,31 @@ We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which sum
 tar_read(observed_score_plot)
 ```
 
-To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is constant throughout the game. This fact confirms the constant point rate.
+To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is constant throughout the game.
 
 <!--
 Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield at the start of the game.
 -->
 
-```{r train-observed-tbp-vs-score-plot, fig.cap = "Time between points (TBP) for each team as a function of score. As observed in the train dataset."}
+```{r train-observed-tbp-vs-score-plot, fig.cap = "TBP for each team as a function of score. As observed in the train dataset."}
 tar_read(observed_tbp_vs_score_plot)
 ```
 
-Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) plots the estimated distribution for each team. The estimated distributions have an exponential decay which favors an exponential distribution.
+Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) plots the estimated TBP distribution for each team. The density curves have an exponential decay which favors an exponential distribution.
 
 ```{r train-observed-tbp-plot, fig.cap = "Estimated TBP distribution for each team. As observed in the train dataset."}
 tar_read(observed_tbp_plot)
 ```
 
-To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is no dependence between points in each team.
+To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is no dependence between points whithin each team.
 
-```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "Time between points (TBP) for each team as a function of lag TBP. As observed in the train dataset."}
+```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "TBP for each team as a function of previous TBP. As observed in the train dataset."}
 tar_read(observed_tbp_vs_lag_tbp_plot)
 ```
 
-Finally, we take a look at the relation between the teams to inspect for any correlation between them. Figure \@ref(fig:train-observed-window-mean-tbp) shows the average TBP for every `r WINDOW_SIZE` seconds between team blue and red. The horizontal regression line evidentiates that team red has no influence at team blue's point rate and vice versa.
+Finally, we take a look at the correlation between the teams. Figure \@ref(fig:train-observed-window-mean-tbp) exhibits team blue's TBP as a function of team red's TBP, averaged over periods of `r WINDOW_SIZE` seconds. The horizontal regression line evidentiates that team red has no influence on team blue and vice versa.
 
-```{r train-observed-window-mean-tbp, fig.cap = "Mean time between points (TBP) for team blue vs team red. Windows size is 15 seconds. As observed in the train dataset."}
+```{r train-observed-window-mean-tbp, fig.cap = str_glue("Team blue's TBP as a function of team red's TBP, averaged over periods of {WINDOW_SIZE} seconds. As observed in the train dataset.")}
 tar_read(window_mean_tbp_plot)
 ```
 
@@ -112,7 +118,7 @@ point_time[red][1], ..., point_time[red][red_last_score]
 tbp[blue][i] = point_time[blue][i] - point_time[blue][i - 1]
 tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
 
-# Part 3: Prior
+# Part 3: Prior hyperparameter
 MAX_SCORE = 100
 PRIOR_MEAN_TIME = 10
 mean_rate_of_rates = MAX_SCORE / PRIOR_MEAN_TIME
@@ -135,7 +141,7 @@ point_time[blue][1], ..., point_time[blue][blue_last_score]
 point_time[red][1], ..., point_time[red][red_last_score]
 ```
 
-Part 2 shows how to calculate TBP from the given data. For example, `tbp[red][4]` is the amount of time that elapsed between the 3rd and 4th point of team red. It is obtained by simply subtracting `point_time[red][3]` from `point_time[red][4]`.
+Part 2 shows how to calculate TBP from the given data. For example, `tbp[red][4]` is the amount of time that elapsed between the 3rd and 4th point of team red.
 
 ```R
 # Part 2: Transformed data
@@ -146,14 +152,14 @@ tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
 Part 3 summarizes my knowledge before the game even starts. My prior is that teams take on average 10 minutes to get 100 points. On top of that, using an exponential distribution as a prior guarantees that the final model is not too restricted. For instance, the selected prior allows for teams to take from `r round(100 / qexp(1 - 0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` to `r round(100 / qexp(0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` minutes to achieve 100 points.
 
 ```R
-# Part 3: Prior
+# Part 3: Prior hyperparameter
 MAX_SCORE = 100
 PRIOR_MEAN_TIME = 10
 mean_rate_of_rates = MAX_SCORE / PRIOR_MEAN_TIME
 rate_of_rates = 1 / mean_rate_of_rates
 ```
 
-Part 4 explains how the parameters are sampled from the prior. Here, `point_rate[blue]` is the point rate from the blue team and measures how many points team blue makes per minute on average.
+Part 4 explains how the parameters are sampled from the prior. Here, `point_rate[blue]` is team blue's point rate and measures how many points team blue makes per minute on average.
 
 ```R
 # Part 4: Parameters
@@ -161,7 +167,7 @@ point_rate[blue] ~ Exponential(rate_of_rates)
 point_rate[red] ~ Exponential(rate_of_rates)
 ```
 
-Lastly part 5 states that TBP follows an exponential distribution with the specified parameters. More importantly, each point is assumed to be independent from the others.
+Lastly part 5 states that TBP follows an exponential distribution with the specified point rates. More importantly, each point is assumed to be independent from the others.
 
 ```R
 # Part 5: Likelihood
@@ -171,9 +177,9 @@ tbp[red][j] ~ Exponential(point_rate[red])
 
 # Prior model analysis
 
-Before fitting the model to the data, it is interesting to check if the selected prior is appropriate. To do that, we can simulate data from the model using only the prior information. That is, without providing data to the model. Figure \@ref(fig:prior-score-plot) summarizes the simulated data. It shows the score progression for a hypothetical team as simulated from the prior model.
+Before fitting the model to the data, it is interesting to check if the selected prior is appropriate. To do that, we can simulate data from the model using only the prior information. That is, without providing any data to the model. Figure \@ref(fig:prior-score-plot) summarizes the results. It shows the score progression for a hypothetical team as simulated from the prior model.
 
-As it can be seen, the models allow for a wide range of score progressions. The only restriction is that the trajectories should be linear.
+As it can be seen, the model allows for a wide range of score progressions. The only restriction is that the trajectories should be linear.
 
 ```{r prior-score-plot, fig.cap = "Score progression for a hypothetical team. As simulated from the prior model."}
 tar_read(prior_model_score_plot)
@@ -182,6 +188,8 @@ tar_read(prior_model_score_plot)
 # Results
 
 ## Train dataset
+
+TODO. Plot prediction to show result, then coefficient table, then probability of winning.
 
 ```{r}
 tar_read(train_model_rate_table) %>%
@@ -203,7 +211,7 @@ tar_read(train_model_rate_table) %>%
 ```
 
 ```{r}
-tar_read(train_model_score_plot)
+#tar_read(train_model_score_plot)
 ```
 
 ## Test dataset
@@ -228,9 +236,13 @@ tar_read(test_model_rate_table) %>%
 ```
 
 ```{r}
-tar_read(test_model_score_plot)
+#tar_read(test_model_score_plot)
 ```
+
+## A sad truth
+
+TODO. Talk about cumulative average model.
 
 # Conclusion
 
-TODO
+TODO. Check abstract conclusion.
