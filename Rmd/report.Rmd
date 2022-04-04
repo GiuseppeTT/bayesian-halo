@@ -31,9 +31,9 @@ source("R/constants.R")
 
 **Introduction:** I used bayesian stats to model a match of Big Team Battle Slayer (BTBS). BTBS is a game mode of Halo Infinite in which 2 teams score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
 
-**Model and results:** The fit model showed a good fit to the data with test MSE TODO. Moreover, it provided some powerful insights such as credible intervals for the team point rates and the probability of team blue winning at any timepoint.
+**Model and results:** The fit model showed a good fit to the data with test MSE TODO. Moreover, it provided some powerful insights such as credible intervals for the team point rates and the probability of team blue winning at any time point.
 
-**Conclusion:** Unfourtunately, the fit model performance was lower than simple accumulative average model which, along with other disadvatanges such as computational scale and math complexity make the final model less interesting for robust applications such the ones found in the industry.
+**Conclusion:** Unfortunately, the fit model performance was lower than simple cumulative average model which, along with other disadvantages such as computational scale and math complexity make the final model less interesting for robust applications such the ones found in the industry.
 
 # Introduction
 
@@ -93,13 +93,13 @@ Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) p
 tar_read(observed_tbp_plot)
 ```
 
-To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is no dependence between points whithin each team.
+To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is no dependence between points within each team.
 
 ```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "TBP for each team as a function of previous TBP. As observed in the train dataset."}
 tar_read(observed_tbp_vs_lag_tbp_plot)
 ```
 
-Finally, we take a look at the correlation between the teams. Figure \@ref(fig:train-observed-window-mean-tbp) exhibits team blue's TBP as a function of team red's TBP, averaged over periods of `r WINDOW_SIZE` seconds. The horizontal regression line evidentiates that team red has no influence on team blue and vice versa.
+Finally, we take a look at the correlation between the teams. Figure \@ref(fig:train-observed-window-mean-tbp) exhibits team blue's TBP as a function of team red's TBP, averaged over periods of `r WINDOW_SIZE` seconds. The horizontal regression line indicates that team red has no influence on team blue and vice versa.
 
 ```{r train-observed-window-mean-tbp, fig.cap = str_glue("Team blue's TBP as a function of team red's TBP, averaged over periods of {WINDOW_SIZE} seconds. As observed in the train dataset.")}
 tar_read(window_mean_tbp_plot)
@@ -167,7 +167,7 @@ point_rate[blue] ~ Exponential(rate_of_rates)
 point_rate[red] ~ Exponential(rate_of_rates)
 ```
 
-Lastly part 5 states that TBP follows an exponential distribution with the specified point rates. More importantly, each point is assumed to be independent from the others.
+Lastly, part 5 states that TBP follows an exponential distribution with the specified point rates. More importantly, each point is assumed to be independent from the others.
 
 ```R
 # Part 5: Likelihood
