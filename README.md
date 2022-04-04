@@ -3,6 +3,14 @@
 ## Description
 TODO.
 
+# Too long, didn't read
+
+**Introduction:** I used bayesian stats to model a match of Big Team Battle Slayer (BTBS). BTBS is a game mode of Halo Infinite in which 2 teams score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
+
+**Model and results:** The model showed a good fit to the data with test RMSE TODO. Moreover, it provided some powerful insights such as credible intervals for the team point rates and the probability of team blue winning at any time point.
+
+**Conclusion:** Unfortunately, the model performance was lower than a simple cumulative average which, along with other disadvantages such as computational scale and math complexity, make the final model less interesting for robust applications such the ones found in the industry.
+
 ## How to use
 ### ... On VSCode
 You can run the project inside a development container by following these steps in VSCode:

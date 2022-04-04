@@ -1,6 +1,6 @@
 ---
 title: Bayesian halo
-description: TODO
+description: Modeling my change of winning at Halo Infinite with bayesian stats
 date: "`r Sys.Date()`"
 author: Giuseppe Tinti Tomio
 output:
@@ -31,9 +31,9 @@ source("R/constants.R")
 
 **Introduction:** I used bayesian stats to model a match of Big Team Battle Slayer (BTBS). BTBS is a game mode of Halo Infinite in which 2 teams score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
 
-**Model and results:** The fit model showed a good fit to the data with test MSE TODO. Moreover, it provided some powerful insights such as credible intervals for the team point rates and the probability of team blue winning at any time point.
+**Model and results:** The model showed a good fit to the data with test RMSE TODO. Moreover, it provided some powerful insights such as credible intervals for the team point rates and the probability of team blue winning at any time point.
 
-**Conclusion:** Unfortunately, the fit model performance was lower than simple cumulative average model which, along with other disadvantages such as computational scale and math complexity make the final model less interesting for robust applications such the ones found in the industry.
+**Conclusion:** Unfortunately, the model performance was lower than a simple cumulative average which, along with other disadvantages such as computational scale and math complexity, make the final model less interesting for robust applications such the ones found in the industry.
 
 # Introduction
 
