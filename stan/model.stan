@@ -27,8 +27,11 @@ parameters {
 model {
     rate ~ exponential(rate_of_rates);
 
-    for (i in 2:sample_size)
+    // Does 2:sample_size make sense since there are 2 teams?
+    // Shouldn't I skip for team red too?
+    for (i in 2:sample_size) {
         tbp[i] ~ exponential(rate[team[i]]);
+    }
 }
 generated quantities {
     real rate_contrast;
