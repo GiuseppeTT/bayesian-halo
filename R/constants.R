@@ -7,6 +7,8 @@ STAN_OUTPUT_PATH <- here::here("output/stan/")
 PRIOR_MODEL_PATH <- here::here("stan/prior_model.stan")
 MODEL_PATH <- here::here("stan/model.stan")
 
+PREDICTION_MODEL_PATH <- here::here("stan/prediction_model.stan")
+
 REPORT_SOURCE_PATH <- here::here("Rmd/report.Rmd")
 REPORT_OUTPUT_PATH <- here::here("output/github-pages/report.html")
 
@@ -26,6 +28,6 @@ SEED <- 42
 WINDOW_SIZE <- 15
 
 ALPHA <- 0.01
-FONT_SIZE <- 20
+FONT_SIZE <- 16
 
 DECIMALS <- 1

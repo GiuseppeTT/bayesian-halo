@@ -115,6 +115,38 @@ train_model_targets <- list(
         train_model_fit,
         fit_model(train_model, train_model_data, train_data)
     ),
+    tar_file(
+        train_prediction_model_path,
+        PREDICTION_MODEL_PATH
+    ),
+    tar_target(
+        train_model_predictions,
+        cumulative_predict(
+            stan_one_step_predict,
+            train_data,
+            prediction_model_path = train_prediction_model_path
+        )
+    ),
+    tar_target(
+        train_model_rmse,
+        calculate_model_rmse(train_model_predictions)
+    ),
+    tar_target(
+        train_model_mae,
+        calculate_model_mae(train_model_predictions)
+    ),
+    tar_target(
+        train_model_prediction_coverage,
+        calculate_model_prediction_coverage(train_model_predictions)
+    ),
+    tar_target(
+        train_model_prediction_plot,
+        plot_model_predictions(train_model_predictions)
+    ),
+    tar_target(
+        train_model_residue_plot,
+        plot_model_residues(train_model_predictions)
+    ),
     tar_target(
         train_model_rate_table,
         table_model_rate(train_model_fit)
@@ -169,6 +201,38 @@ test_model_targets <- list(
         test_model_fit,
         fit_model(test_model, test_model_data, test_data)
     ),
+    tar_file(
+        test_prediction_model_path,
+        PREDICTION_MODEL_PATH
+    ),
+    tar_target(
+        test_model_predictions,
+        cumulative_predict(
+            stan_one_step_predict,
+            test_data,
+            prediction_model_path = test_prediction_model_path
+        )
+    ),
+    tar_target(
+        test_model_rmse,
+        calculate_model_rmse(test_model_predictions)
+    ),
+    tar_target(
+        test_model_mae,
+        calculate_model_mae(test_model_predictions)
+    ),
+    tar_target(
+        test_model_prediction_coverage,
+        calculate_model_prediction_coverage(test_model_predictions)
+    ),
+    tar_target(
+        test_model_prediction_plot,
+        plot_model_predictions(test_model_predictions)
+    ),
+    tar_target(
+        test_model_residue_plot,
+        plot_model_residues(test_model_predictions)
+    ),
     tar_target(
         test_model_rate_table,
         table_model_rate(test_model_fit)
@@ -176,6 +240,36 @@ test_model_targets <- list(
     tar_target(
         test_model_score_plot,
         plot_model_score(test_model_fit, test_data)
+    )
+)
+
+sad_truth_targets <- list(
+    tar_target(
+        test_base_predictions,
+        cumulative_predict(
+            base_one_step_predict,
+            test_data
+        )
+    ),
+    tar_target(
+        test_base_rmse,
+        calculate_model_rmse(test_base_predictions)
+    ),
+    tar_target(
+        test_base_mae,
+        calculate_model_mae(test_base_predictions)
+    ),
+    tar_target(
+        test_base_prediction_coverage,
+        calculate_model_prediction_coverage(test_base_predictions)
+    ),
+    tar_target(
+        test_base_prediction_plot,
+        plot_model_predictions(test_base_predictions)
+    ),
+    tar_target(
+        test_base_residue_plot,
+        plot_model_residues(test_base_predictions)
     )
 )
 
@@ -194,6 +288,7 @@ targets <- c(
     train_model_targets,
     test_data_targets,
     test_model_targets,
+    sad_truth_targets,
     report_targets
 )
 

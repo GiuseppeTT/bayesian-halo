@@ -1,6 +1,6 @@
 ---
 title: Bayesian halo
-description: Modeling my change of winning at Halo Infinite with bayesian stats
+description: Modeling my chance of winning at Halo Infinite with bayesian stats
 date: "`r Sys.Date()`"
 author: Giuseppe Tinti Tomio
 output:
@@ -13,7 +13,8 @@ repository_url: https://github.com/GiuseppeTT/bayesian-halo
 knitr::opts_chunk$set(
     echo = FALSE,
     warning = FALSE,
-    message = FALSE
+    message = FALSE,
+    layout = "l-body-outset"
 )
 ```
 
@@ -29,15 +30,15 @@ source("R/constants.R")
 
 # Too long, didn't read
 
-**Introduction:** I used bayesian stats to model a match of Big Team Battle Slayer (BTBS). BTBS is a game mode of Halo Infinite in which 2 teams score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
+**Introduction:** I used bayesian stats to model a match of [Halo Infinite](https://www.xbox.com/games/halo-infinite). The game consists of 2 teams that must score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
 
-**Model and results:** The model showed a good fit to the data with test RMSE TODO. Moreover, it provided some powerful insights such as credible intervals for the team point rates and the probability of team blue winning at any time point.
+**Model and results:** The model obtained a median error size of `r scales::number(60 * tar_read(test_model_mae), accuracy = 10^(-DECIMALS))` seconds when predicting when the next point will be scored. Moreover, it provided powerful insights such as estimates for the team point rates and the probability of team blue winning at any given time.
 
-**Conclusion:** Unfortunately, the model performance was lower than a simple cumulative average which, along with other disadvantages such as computational scale and math complexity, make the final model less interesting for robust applications such the ones found in the industry.
+**Conclusion:** The model was little better than a simple cumulative average (median error size of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds). Therefore, the bayesian model is well suited for a high accurate analysis, but fails justify its computational demand and math complexity for more sensible applications.
 
 # Introduction
 
-If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/games/halo-infinite) a lot in the past weeks. One game mode that I particularly like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other on a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game. If no team hits 100 points by the 15 minutes mark, the team with the biggest score wins.
+If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/games/halo-infinite) a lot in the past weeks. One game mode that I like is Big Team Battle Slayer (BTBS) in which 2 teams of 16 players face each other on a battlefield. Each time one player of team blue defeats a player of team red, team blue earns a point. The first team to achieve 100 points wins the game. If no team hits 100 points by the 15 minutes mark, the team with the biggest score wins.
 
 Now if you are really like me, you have also been wondering about how to statistically model the game. Specifically, I was interested in calculating the probability of my team winning given the current score. Intuitively, I know that there is a 50%-50% chance of winning when the game starts. If the score is 20 - 10 for my team, I also expect to have a higher although not extreme probability of winning. But what about when the score is 90 - 80? From my experience this game is a certain win, but how should I quantify this probability? This is the question that my work sets out to answer using bayesian statistics.
 
@@ -53,8 +54,8 @@ Each dataset is composed of three variables (columns):
 
 Due to the way the data was recorded, there are a few concerns which could not be addressed:
 
-- The data was extracted from a gameplay available at YouTube and, therefore, might not be representative. This is because people tend to publish only games where they had a good performance.
-- The data was manually extracted, which means that there may be a difference between the recorded and the actual time of each score point.
+- The data might not be representative because it was extracted from YouTube. This is due to the fact that people tend to publish only games in which they had a good performance.
+- The data was manually extracted, which means that there may be a difference between the recorded and the actual time for each score point.
 - The maximum time resolution is 1 second as it is constrained by the in-game time resolution, obtained from the scoreboard timer.
 
 <!--
@@ -71,13 +72,13 @@ In the exploratory analysis, I demonstrate how the following properties about th
 - **Constant average** : The average time between points is constant throughout the game. The average differs between the teams.
 - **Exponentially distributed** : The time between points follows an exponential distribution. The distribution differs between the teams.
 
-We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the data. It shows the score progression for both teams as observed in the train dataset. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear, which suggests that the teams earn points at a constant rate.
+We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the train dataset. It shows the score progression for both teams. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear, which suggests that the teams earn points at a constant rate.
 
 ```{r train-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the train dataset."}
 tar_read(observed_score_plot)
 ```
 
-To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen by the regression curves, the average TBP is constant throughout the game.
+To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen from the regression curves, the average TBP is constant throughout the game.
 
 <!--
 Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield at the start of the game.
@@ -99,7 +100,7 @@ To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp
 tar_read(observed_tbp_vs_lag_tbp_plot)
 ```
 
-Finally, we take a look at the correlation between the teams. Figure \@ref(fig:train-observed-window-mean-tbp) exhibits team blue's TBP as a function of team red's TBP, averaged over periods of `r WINDOW_SIZE` seconds. The horizontal regression line indicates that team red has no influence on team blue and vice versa.
+Finally, we take a look at the correlation between the teams. Figure \@ref(fig:train-observed-window-mean-tbp) exhibits team blue's TBP as a function of team red's TBP, averaged over periods of `r WINDOW_SIZE` seconds. The horizontal regression curve indicates that team red has no influence on team blue and vice versa.
 
 ```{r train-observed-window-mean-tbp, fig.cap = str_glue("Team blue's TBP as a function of team red's TBP, averaged over periods of {WINDOW_SIZE} seconds. As observed in the train dataset.")}
 tar_read(window_mean_tbp_plot)
@@ -109,7 +110,7 @@ tar_read(window_mean_tbp_plot)
 
 Accounting for all the discoveries made in the exploratory data analysis, I came up with the following bayesian model.
 
-```R
+```python
 # Part 1: Data
 point_time[blue][1], ..., point_time[blue][blue_last_score]
 point_time[red][1], ..., point_time[red][red_last_score]
@@ -133,7 +134,7 @@ tbp[blue][i] ~ Exponential(point_rate[blue])
 tbp[red][j] ~ Exponential(point_rate[red])
 ```
 
-Part 1 describes the input data, which is the time at which the teams scored each point. For instance, `point_time[blue][5]` is the time point in which the blue team scored its 5th point.
+Part 1 describes the input data, which is the time at which the teams scored each point. For instance, `point_time[blue][5]` is the time in which the blue team scored its 5th point.
 
 ```R
 # Part 1: Data
@@ -141,7 +142,7 @@ point_time[blue][1], ..., point_time[blue][blue_last_score]
 point_time[red][1], ..., point_time[red][red_last_score]
 ```
 
-Part 2 shows how to calculate TBP from the given data. For example, `tbp[red][4]` is the amount of time that elapsed between the 3rd and 4th point of team red.
+Part 2 explains how to calculate TBP from the given data. For example, `tbp[red][4]` is the amount of time that elapsed between the 3rd and 4th point of team red.
 
 ```R
 # Part 2: Transformed data
@@ -149,6 +150,7 @@ tbp[blue][i] = point_time[blue][i] - point_time[blue][i - 1]
 tbp[red][j] = point_time[red][j] - point_time[red][j - 1]
 ```
 
+<!-- The second and third sentences could be simplified so that the paragraph takes only 3 lines -->
 Part 3 summarizes my knowledge before the game even starts. My prior is that teams take on average 10 minutes to get 100 points. On top of that, using an exponential distribution as a prior guarantees that the final model is not too restricted. For instance, the selected prior allows for teams to take from `r round(100 / qexp(1 - 0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` to `r round(100 / qexp(0.05 / 2, rate = 1 / PRIOR_MEAN_RATE_OF_RATES))` minutes to achieve 100 points.
 
 ```R
@@ -159,7 +161,7 @@ mean_rate_of_rates = MAX_SCORE / PRIOR_MEAN_TIME
 rate_of_rates = 1 / mean_rate_of_rates
 ```
 
-Part 4 explains how the parameters are sampled from the prior. Here, `point_rate[blue]` is team blue's point rate and measures how many points team blue makes per minute on average.
+Part 4 reports how parameters are sampled from the prior. Here, `point_rate[red]` is team red's point rate and measures how many points team red makes per minute on average.
 
 ```R
 # Part 4: Parameters
@@ -177,9 +179,9 @@ tbp[red][j] ~ Exponential(point_rate[red])
 
 # Prior model analysis
 
-Before fitting the model to the data, it is interesting to check if the selected prior is appropriate. To do that, we can simulate data from the model using only the prior information. That is, without providing any data to the model. Figure \@ref(fig:prior-score-plot) summarizes the results. It shows the score progression for a hypothetical team as simulated from the prior model.
+Before fitting the model to the data, it is interesting to check if the selected prior is appropriate. To do that, we can simulate data from the model using only the prior information.
 
-As it can be seen, the model allows for a wide range of score progressions. The only restriction is that the trajectories should be linear.
+Figure \@ref(fig:prior-score-plot) summarizes the simulation. It shows possible score progressions from a hypothetical team. As it can be seen, the model allows for a wide range of score progressions.
 
 ```{r prior-score-plot, fig.cap = "Score progression for a hypothetical team. As simulated from the prior model."}
 tar_read(prior_model_score_plot)
@@ -189,9 +191,23 @@ tar_read(prior_model_score_plot)
 
 ## Train dataset
 
-TODO. Plot prediction to show result, then coefficient table, then probability of winning.
+The model attained a good performance in the train dataset and Figure \@ref(fig:train-model-prediction-plot) makes it very clear. It shows the observed (black dot) and predited (grey line) time for each score point. The fact that it is difficult to distingush one from the other is a good sign.
 
-```{r}
+```{r train-model-prediction-plot, fig.cap = "Observed (black dot) and predited (blue line) time for each score point. As observed in the train dataset."}
+tar_read(train_model_prediction_plot)
+```
+
+Figure \@ref(fig:train-model-residue-plot) allow us to zoom in into the model errors. It plots the error (black line) made for each score point. The errors are quite small, with a median size of `r scales::number(60 * tar_read(train_model_mae), accuracy = 10^(-DECIMALS))` seconds.
+
+Figure \@ref(fig:train-model-residue-plot) also shows shaded regions. They are a range of values that should contain most of the error line and represent how wrong the model thinks it can be. Since the region convers `r scales::percent(tar_read(train_model_prediction_coverage), accuracy = 10^(-DECIMALS))` of the errors and are sufficiently narrow, the model confidence is on point.
+
+```{r train-model-residue-plot, fig.cap = "Error (black line) made for each score point. Shaded regions should contain at least 95% of the errors. As observed in the train dataset."}
+tar_read(train_model_residue_plot)
+```
+
+Now that we know the model is well fit, we can turn to it for answers on how good the teams are. Table \@ref(tab:train-model-rate-table) summarizes the point rates. Team blue is the best team with an estimated point rate of `r tar_read(train_model_rate_table) %>% filter(rate == "Blue") %>% pull(.value) %>% scales::number(accuracy = 10^(-DECIMALS))` points per minute. Moreover, its rate is estimated to be at least `r tar_read(train_model_rate_table) %>% filter(rate == "Contrast") %>% pull(.lower) %>% scales::number(accuracy = 10^(-DECIMALS))` points per minute bigger than the one of team red.
+
+```{r train-model-rate-table}
 tar_read(train_model_rate_table) %>%
     select(
         rate,
@@ -215,6 +231,14 @@ tar_read(train_model_rate_table) %>%
 ```
 
 ## Test dataset
+
+```{r}
+tar_read(test_model_prediction_plot)
+```
+
+```{r}
+tar_read(test_model_residue_plot)
+```
 
 ```{r}
 tar_read(test_model_rate_table) %>%
@@ -241,7 +265,17 @@ tar_read(test_model_rate_table) %>%
 
 ## A sad truth
 
-TODO. Talk about cumulative average model.
+with an error of `r scales::number(60 * tar_read(train_model_rmse), accuracy = 10^(-DECIMALS))` seconds when predicting when the next point is going to be scored in each team.
+
+```{r}
+tar_read(test_base_prediction_plot)
+```
+
+```{r}
+tar_read(test_base_residue_plot)
+```
+
+TODO. Talk about cumulative average model. Non null probability for time travel.
 
 # Conclusion
 

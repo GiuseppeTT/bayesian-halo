@@ -5,16 +5,15 @@ plot_observed_score <- function(
 ) {
     plot <-
         data %>%
-        ggplot(aes(x = time, y = score, color = team)) +
+        ggplot(aes(x = time, y = score, linetype = team)) +
         geom_step(size = 2) +
         scale_x_continuous(limits = c(GAME_MIN_TIME, GAME_MAX_TIME)) +
         scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
-        scale_color_viridis_d() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Time (minutes)",
             y = "Score",
-            color = "Team"
+            linetype = "Team"
         )
 
     return(plot)
@@ -46,14 +45,13 @@ plot_observed_tbp <- function(
 ) {
     plot <-
         data %>%
-        ggplot(aes(x = 60 * tbp, color = team)) +
+        ggplot(aes(x = 60 * tbp, linetype = team)) +
         geom_density(size = 2) +
-        scale_color_viridis_d() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "TBP (seconds)",
             y = "Density",
-            color = "Team"
+            linetype = "Team"
         )
 
     return(plot)
@@ -100,10 +98,12 @@ plot_observed_window_mean_tbp <- function(
         ggplot(aes(x = 60 * Red, y = 60 * Blue)) +
         geom_point() +
         geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), size = 2) +
+        scale_x_log10() +
+        scale_y_log10() +
         theme_minimal(FONT_SIZE) +
         labs(
-            x = "Red TBP (seconds)",
-            y = "Blue TBP (seconds)"
+            x = "Team red' TBP (seconds)",
+            y = "Team blue's TBP (seconds)"
         )
 
     return(plot)
