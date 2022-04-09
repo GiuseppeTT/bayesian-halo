@@ -53,6 +53,12 @@ jobs:
           sudo apt-get install libssl-dev
           sudo apt-get install libzmq3-dev
 
+      # Manually added
+      - name: Install additional Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y libglpk-dev
+
       - name: Cache packages
         uses: actions/cache@v1
         with:
