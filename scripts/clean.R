@@ -15,6 +15,7 @@ STAN_OUTPUT_PATH %>%
     dir_ls() %>%
     map(file_delete)
 
-RESULTS_PATH %>%
+REPORT_OUTPUT_PATH %>%
+    path_dir() %>%
     dir_ls() %>%
     map(file_delete)

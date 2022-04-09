@@ -58,24 +58,20 @@ exploratory_analysis_targets <- list(
         plot_observed_score(train_data)
     ),
     tar_target(
-        observed_tbp_plot,
-        plot_observed_tbp(train_data)
-    ),
-    tar_target(
         observed_tbp_vs_score_plot,
         plot_observed_tbp_vs_score(train_data)
+    ),
+    tar_target(
+        observed_tbp_plot,
+        plot_observed_tbp(train_data)
     ),
     tar_target(
         observed_tbp_vs_lag_tbp_plot,
         plot_observed_tbp_vs_lag_tbp(train_data)
     ),
     tar_target(
-        permuted_tbp_vs_lag_tbp_plot,
-        plot_permuted_tbp_vs_lag_tbp(train_data)
-    ),
-    tar_target(
         window_mean_tbp_plot,
-        plot_window_mean_tbp(train_data, window_size = WINDOW_SIZE)
+        plot_observed_window_mean_tbp(train_data, window_size = WINDOW_SIZE)
     )
 )
 
@@ -97,63 +93,8 @@ prior_targets <- list(
         fit_prior_model(prior_model, prior_model_data)
     ),
     tar_target(
-        prior_model_rate_table,
-        table_prior_model_rate(prior_model_fit)
-    ),
-    tar_target(
-        prior_model_rate_plot,
-        plot_prior_model_rate(prior_model_fit)
-    ),
-    tar_target(
         prior_model_score_plot,
         plot_prior_model_score(prior_model_fit)
-    ),
-    tar_target(
-        prior_model_tbp_plot,
-        plot_prior_model_tbp(prior_model_fit)
-    ),
-    tar_target(
-        prior_model_tbp_vs_score_plot,
-        plot_prior_model_tbp_vs_score(prior_model_fit)
-    )
-)
-
-train_model_targets <- list(
-    tar_file(
-        train_model_path,
-        MODEL_PATH
-    ),
-    tar_target(
-        train_model,
-        create_model(train_model_path)
-    ),
-    tar_target(
-        train_model_data,
-        create_model_data(train_data)
-    ),
-    tar_target(
-        train_model_fit,
-        fit_model(train_model, train_model_data, train_data)
-    ),
-    tar_target(
-        train_model_rate_table,
-        table_model_rate(train_model_fit)
-    ),
-    tar_target(
-        train_model_rate_plot,
-        plot_model_rate(train_model_fit)
-    ),
-    tar_target(
-        train_model_score_plot,
-        plot_model_score(train_model_fit, train_data)
-    ),
-    tar_target(
-        train_model_tbp_plot,
-        plot_model_tbp(train_model_fit, train_data)
-    ),
-    tar_target(
-        train_model_tbp_vs_score_plot,
-        plot_model_tbp_vs_score(train_model_fit, train_data)
     )
 )
 
@@ -185,6 +126,10 @@ test_data_targets <- list(
 )
 
 test_model_targets <- list(
+    tar_target(
+        test_score_plot,
+        plot_observed_score(test_data)
+    ),
     tar_file(
         test_model_path,
         MODEL_PATH
@@ -201,25 +146,71 @@ test_model_targets <- list(
         test_model_fit,
         fit_model(test_model, test_model_data, test_data)
     ),
+    tar_file(
+        test_prediction_model_path,
+        PREDICTION_MODEL_PATH
+    ),
+    tar_target(
+        test_model_predictions,
+        cumulative_predict(
+            stan_one_step_predict,
+            test_data,
+            prediction_model_path = test_prediction_model_path
+        )
+    ),
+    tar_target(
+        test_model_mae,
+        calculate_model_mae(test_model_predictions)
+    ),
+    tar_target(
+        test_model_prediction_coverage,
+        calculate_model_prediction_coverage(test_model_predictions, threshold = THRESHOLD)
+    ),
+    tar_target(
+        test_model_interval_median_size,
+        calculate_model_interval_median_size(test_model_predictions)
+    ),
+    tar_target(
+        test_model_prediction_plot,
+        plot_model_predictions(test_model_predictions)
+    ),
+    tar_target(
+        test_model_residue_plot,
+        plot_model_residues(test_model_predictions)
+    ),
     tar_target(
         test_model_rate_table,
         table_model_rate(test_model_fit)
+    )
+)
+
+sad_truth_targets <- list(
+    tar_target(
+        test_base_predictions,
+        cumulative_predict(
+            base_one_step_predict,
+            test_data
+        )
     ),
     tar_target(
-        test_model_rate_plot,
-        plot_model_rate(test_model_fit)
+        test_base_mae,
+        calculate_model_mae(test_base_predictions)
     ),
     tar_target(
-        test_model_score_plot,
-        plot_model_score(test_model_fit, test_data)
+        test_base_prediction_coverage,
+        calculate_model_prediction_coverage(test_base_predictions)
     ),
     tar_target(
-        test_model_tbp_plot,
-        plot_model_tbp(test_model_fit, test_data)
+        test_base_interval_median_size,
+        calculate_model_interval_median_size(test_base_predictions)
     ),
     tar_target(
-        test_model_tbp_vs_score_plot,
-        plot_model_tbp_vs_score(test_model_fit, test_data)
+        test_base_prediction_plot,
+        plot_model_predictions(test_base_predictions)
+    ),
+    tar_target(
+        test_base_residue_plot,
+        plot_model_residues(test_base_predictions)
     )
 )
 
@@ -235,9 +226,9 @@ targets <- c(
     train_data_targets,
     exploratory_analysis_targets,
     prior_targets,
-    train_model_targets,
     test_data_targets,
     test_model_targets,
+    sad_truth_targets,
     report_targets
 )
 

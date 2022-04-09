@@ -5,34 +5,15 @@ plot_observed_score <- function(
 ) {
     plot <-
         data %>%
-        ggplot(aes(x = time, y = score, color = team)) +
+        ggplot(aes(x = time, y = score, linetype = team)) +
         geom_step(size = 2) +
         scale_x_continuous(limits = c(GAME_MIN_TIME, GAME_MAX_TIME)) +
         scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
-        scale_color_viridis_d() +
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Time (minutes)",
             y = "Score",
-            color = "Team"
-        )
-
-    return(plot)
-}
-
-plot_observed_tbp <- function(
-    data
-) {
-    plot <-
-        data %>%
-        ggplot(aes(x = tbp, color = team)) +
-        geom_density(size = 2) +
-        scale_color_viridis_d() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Time between points (minutes)",
-            y = "Density",
-            color = "Team"
+            linetype = "Team"
         )
 
     return(plot)
@@ -44,7 +25,7 @@ plot_observed_tbp_vs_score <- function(
     plot <-
         data %>%
         rename(Team = team) %>%
-        ggplot(aes(x = score, y = tbp)) +
+        ggplot(aes(x = score, y = 60 * tbp)) +
         geom_point() +
         geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), size = 2) +
         facet_grid(cols = vars(Team), labeller = label_both) +
@@ -53,7 +34,24 @@ plot_observed_tbp_vs_score <- function(
         theme_minimal(FONT_SIZE) +
         labs(
             x = "Score",
-            y = "Time between points (minutes)"
+            y = "TBP (seconds)"
+        )
+
+    return(plot)
+}
+
+plot_observed_tbp <- function(
+    data
+) {
+    plot <-
+        data %>%
+        ggplot(aes(x = 60 * tbp, linetype = team)) +
+        geom_density(size = 2) +
+        theme_minimal(FONT_SIZE) +
+        labs(
+            x = "TBP (seconds)",
+            y = "Density",
+            linetype = "Team"
         )
 
     return(plot)
@@ -65,7 +63,7 @@ plot_observed_tbp_vs_lag_tbp <- function(
     plot <-
         data %>%
         rename(Team = team) %>%
-        ggplot(aes(x = lag(tbp), y = tbp)) +
+        ggplot(aes(x = 60 * lag(tbp), y = 60 * tbp)) +
         geom_point() +
         geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), size = 2) +
         facet_grid(cols = vars(Team), labeller = label_both) +
@@ -73,47 +71,14 @@ plot_observed_tbp_vs_lag_tbp <- function(
         scale_y_log10() +
         theme_minimal(FONT_SIZE) +
         labs(
-            x = "Lag time between points (minutes)",
-            y = "Time between points (minutes)"
+            x = "Previous TBP (seconds)",
+            y = "TBP (seconds)"
         )
 
     return(plot)
 }
 
-plot_permuted_tbp_vs_lag_tbp <- function(
-    data
-) {
-    data <-
-        data %>%
-        drop_na(tbp) %>%
-        group_by(team) %>%
-        mutate(tbp = permute(tbp))
-
-    plot <-
-        data %>%
-        rename(Team = team) %>%
-        ggplot(aes(x = lag(tbp), y = tbp)) +
-        geom_point() +
-        geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), size = 2) +
-        facet_grid(cols = vars(Team), labeller = label_both) +
-        scale_x_log10() +
-        scale_y_log10() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Lag time between points (minutes)",
-            y = "Time between points (minutes)"
-        )
-
-    return(plot)
-}
-
-permute <- function(
-    x
-) {
-    sample(x)
-}
-
-plot_window_mean_tbp <- function(
+plot_observed_window_mean_tbp <- function(
     data,
     window_size  # In seconds
 ) {
@@ -130,13 +95,15 @@ plot_window_mean_tbp <- function(
 
     plot <-
         data %>%
-        ggplot(aes(x = Red, y = Blue)) +
+        ggplot(aes(x = 60 * Red, y = 60 * Blue)) +
         geom_point() +
         geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"), size = 2) +
+        scale_x_log10() +
+        scale_y_log10() +
         theme_minimal(FONT_SIZE) +
         labs(
-            x = "Red time between points (minutes)",
-            y = "Blue time between points (minutes)"
+            x = "Team red' TBP (seconds)",
+            y = "Team blue's TBP (seconds)"
         )
 
     return(plot)

@@ -3,13 +3,16 @@
 RAW_TRAIN_DATA_PATH <- here::here("data/raw/train.csv")
 RAW_TEST_DATA_PATH <- here::here("data/raw/test.csv")
 
-STAN_OUTPUT_PATH <- here::here("stan_output")
+STAN_OUTPUT_PATH <- here::here("output/stan/")
 PRIOR_MODEL_PATH <- here::here("stan/prior_model.stan")
 MODEL_PATH <- here::here("stan/model.stan")
 
-RESULTS_PATH <- here::here("results/")
+PREDICTION_MODEL_PATH <- here::here("stan/prediction_model.stan")
+
 REPORT_SOURCE_PATH <- here::here("Rmd/report.Rmd")
-REPORT_OUTPUT_PATH <- here::here("results/report.html")
+REPORT_OUTPUT_PATH <- here::here("output/github-pages/report.html")
+
+NETWORK_PATH <- here::here("output/github-pages/targets.html")
 
 GAME_MIN_TIME <- 0
 GAME_MAX_TIME <- 15
@@ -24,9 +27,11 @@ POSTERIOR_PLOT_SAMPLE_COUNT <- 1000
 CHAIN_COUNT <- 4
 SEED <- 42
 
-WINDOW_SIZE <- 15
+WINDOW_SIZE <- 5
+
+THRESHOLD <- 0.01
 
 ALPHA <- 0.01
-FONT_SIZE <- 20
+FONT_SIZE <- 16
 
 DECIMALS <- 1
