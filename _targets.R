@@ -185,6 +185,10 @@ test_data_targets <- list(
 )
 
 test_model_targets <- list(
+    tar_target(
+        test_score_plot,
+        plot_observed_score(test_data)
+    ),
     tar_file(
         test_model_path,
         MODEL_PATH
@@ -223,7 +227,11 @@ test_model_targets <- list(
     ),
     tar_target(
         test_model_prediction_coverage,
-        calculate_model_prediction_coverage(test_model_predictions)
+        calculate_model_prediction_coverage(test_model_predictions, threshold = THRESHOLD)
+    ),
+    tar_target(
+        test_model_interval_median_size,
+        calculate_model_interval_median_size(test_model_predictions)
     ),
     tar_target(
         test_model_prediction_plot,

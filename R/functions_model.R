@@ -240,6 +240,15 @@ calculate_model_prediction_coverage <- function(
         return()
 }
 
+calculate_model_interval_median_size <- function(
+    predictions
+) {
+    predictions %>%
+        summarise(median_size = median(.size, na.rm = TRUE)) %>%
+        pull(median_size) %>%
+        return()
+}
+
 table_model_rate <- function(
     model_fit
 ) {
