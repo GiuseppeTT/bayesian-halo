@@ -12,6 +12,8 @@ PREDICTION_MODEL_PATH <- here::here("stan/prediction_model.stan")
 REPORT_SOURCE_PATH <- here::here("Rmd/report.Rmd")
 REPORT_OUTPUT_PATH <- here::here("output/github-pages/report.html")
 
+NETWORK_PATH <- here::here("output/github-pages/targets.html")
+
 GAME_MIN_TIME <- 0
 GAME_MAX_TIME <- 15
 GAME_MIN_SCORE <- 0

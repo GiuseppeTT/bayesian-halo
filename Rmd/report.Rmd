@@ -209,17 +209,13 @@ tar_read(test_model_rate_table) %>%
     )
 ```
 
-```{r}
-#tar_read(test_model_score_plot)
-```
-
 ## Probability of winning
 
 TODO.
 
 ## A sad truth
 
-TODO. Talk about cumulative average model. Almost as good as the bayesian model and more simple. Non null probability for time travel.
+TODO. Talk about cumulative average model. Almost as good as the bayesian model and more simple. Non null probability for time travel. Median error size of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds. Coverage of `r scales::percent(tar_read(test_base_prediction_coverage), accuracy = 10^(-DECIMALS))`. Median interval size of `r scales::number(60 * tar_read(test_base_interval_median_size), accuracy = 10^(-DECIMALS))` seconds.
 
 ```{r test-base-prediction-plot, fig.cap = "Observed (black dot) and predicted (blue line) time for each score point. As observed in the test dataset with the cumulative average model."}
 tar_read(test_base_prediction_plot)
@@ -231,4 +227,4 @@ tar_read(test_base_residue_plot)
 
 # Conclusion
 
-The model was little better than a simple cumulative average (median error size of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds). Therefore, the bayesian model is well suited for a high accurate analysis, but fails to justify its computational demand and math complexity for more sensible applications.
+The model was little better than a simple cumulative average. Therefore, the bayesian model is well suited for a high accurate analysis, but fails to justify its computational demand and math complexity for more sensible applications.
