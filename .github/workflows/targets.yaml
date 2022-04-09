@@ -72,6 +72,12 @@ jobs:
           if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
           renv::restore()
 
+      # Manually added
+      - name: Install cmdstan
+        shell: Rscript {0}
+        run: |
+          cmdstanr::install_cmdstan()
+
       - name: Check if previous runs exists
         id: runs-exist
         run: git ls-remote --exit-code --heads origin targets-runs
