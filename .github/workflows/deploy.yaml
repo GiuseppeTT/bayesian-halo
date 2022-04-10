@@ -1,4 +1,4 @@
-# Based from targets::tar_github_actions()
+# Based on targets::tar_github_actions()
 
 on:
   push:
