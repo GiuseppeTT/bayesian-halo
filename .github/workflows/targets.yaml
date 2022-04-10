@@ -42,9 +42,9 @@ jobs:
       - uses: r-lib/actions/setup-r@master
       - uses: r-lib/actions/setup-pandoc@master
 
-      - name: Install Mac system dependencies
-        if: runner.os == 'macOS'
-        run: brew install zeromq
+      # - name: Install Mac system dependencies
+      #   if: runner.os == 'macOS'
+      #   run: brew install zeromq
 
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
@@ -78,67 +78,77 @@ jobs:
         run: |
           cmdstanr::install_cmdstan()
 
-      - name: Check if previous runs exists
-        id: runs-exist
-        run: git ls-remote --exit-code --heads origin targets-runs
-        continue-on-error: true
+      # - name: Check if previous runs exists
+      #   id: runs-exist
+      #   run: git ls-remote --exit-code --heads origin targets-runs
+      #   continue-on-error: true
 
-      - name: Checkout previous run
-        if: steps.runs-exist.outcome == 'success'
-        uses: actions/checkout@v2
-        with:
-          ref: targets-runs
-          fetch-depth: 1
-          path: .targets-runs
+      # - name: Checkout previous run
+      #   if: steps.runs-exist.outcome == 'success'
+      #   uses: actions/checkout@v2
+      #   with:
+      #     ref: targets-runs
+      #     fetch-depth: 1
+      #     path: .targets-runs
 
-      - name: Restore output files from the previous run
-        if: steps.runs-exist.outcome == 'success'
-        run: |
-          for (dest in scan(".targets-runs/.targets-files", what = character())) {
-            source <- file.path(".targets-runs", dest)
-            if (!file.exists(dirname(dest))) dir.create(dirname(dest), recursive = TRUE)
-            if (file.exists(source)) file.rename(source, dest)
-          }
-        shell: Rscript {0}
+      # - name: Restore output files from the previous run
+      #   if: steps.runs-exist.outcome == 'success'
+      #   run: |
+      #     for (dest in scan(".targets-runs/.targets-files", what = character())) {
+      #       source <- file.path(".targets-runs", dest)
+      #       if (!file.exists(dirname(dest))) dir.create(dirname(dest), recursive = TRUE)
+      #       if (file.exists(source)) file.rename(source, dest)
+      #     }
+      #   shell: Rscript {0}
 
       - name: Run targets pipeline
         run: targets::tar_make()
         shell: Rscript {0}
 
-      - name: Identify files that the targets pipeline produced
-        run: git ls-files -mo --exclude=renv > .targets-files
-
-      - name: Create the runs branch if it does not already exist
-        if: steps.runs-exist.outcome != 'success'
-        run: git checkout --orphan targets-runs
-
-      - name: Put the worktree in the runs branch if the latter already exists
-        if: steps.runs-exist.outcome == 'success'
+      - name: Remove gitignore files from github-pages folder for deploy
         run: |
-          rm -r .git
-          mv .targets-runs/.git .
-          rm -r .targets-runs
+          find output/github-pages -name ".gitignore" -type f -delete
 
-      - name: Upload latest run
-        run: |
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "actions@github.com"
-          rm -r .gitignore .github/workflows
-          git add --all -- ':!renv'
-          for file in $(git ls-files -mo --exclude=renv)
-          do
-            git add $file
-          done
-          git commit -am "Run pipeline"
-          git push origin targets-runs
-
-      - name: Prepare failure artifact
-        if: failure()
-        run: rm -rf .git .github .targets-files .targets-runs
-
-      - name: Post failure artifact
-        if: failure()
-        uses: actions/upload-artifact@main
+      - name: Deploy presentation to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4.3.0
         with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: .
+          branch: gh-pages
+          folder: output/github-pages
+
+      # - name: Identify files that the targets pipeline produced
+      #   run: git ls-files -mo --exclude=renv > .targets-files
+
+      # - name: Create the runs branch if it does not already exist
+      #   if: steps.runs-exist.outcome != 'success'
+      #   run: git checkout --orphan targets-runs
+
+      # - name: Put the worktree in the runs branch if the latter already exists
+      #   if: steps.runs-exist.outcome == 'success'
+      #   run: |
+      #     rm -r .git
+      #     mv .targets-runs/.git .
+      #     rm -r .targets-runs
+
+      # - name: Upload latest run
+      #   run: |
+      #     git config --local user.name "GitHub Actions"
+      #     git config --local user.email "actions@github.com"
+      #     rm -r .gitignore .github/workflows
+      #     git add --all -- ':!renv'
+      #     for file in $(git ls-files -mo --exclude=renv)
+      #     do
+      #       git add $file
+      #     done
+      #     git commit -am "Run pipeline"
+      #     git push origin targets-runs
+
+      # - name: Prepare failure artifact
+      #   if: failure()
+      #   run: rm -rf .git .github .targets-files .targets-runs
+
+      # - name: Post failure artifact
+      #   if: failure()
+      #   uses: actions/upload-artifact@main
+      #   with:
+      #     name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+      #     path: .
