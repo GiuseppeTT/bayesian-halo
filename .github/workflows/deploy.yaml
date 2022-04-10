@@ -39,6 +39,13 @@ jobs:
         run: |
           cmdstanr::install_cmdstan()
 
+      - name: Cache targets
+        uses: actions/cache@v3
+        with:
+          path: _targets
+          key: ${{ runner.os }}-targets-${{ hashFiles('**/_targets.R') }}
+          restore-keys: ${{ runner.os }}-targets-
+
       - name: Run targets pipeline
         shell: Rscript {0}
         run: |
