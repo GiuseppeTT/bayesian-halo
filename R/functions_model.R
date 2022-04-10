@@ -49,6 +49,53 @@ fit_model <- function(
     return(model_fit)
 }
 
+table_model_rate <- function(
+    model_fit
+) {
+    table <-
+        model_fit %>%
+        gather_draws(rate[team], rate_contrast) %>%
+        ungroup() %>%
+        mutate(rate = case_when(
+            .variable == "rate_contrast" ~ "Contrast",
+            TRUE ~ as.character(team)
+        ))
+
+    table <-
+        table %>%
+        mutate(rate = fct_relevel(
+            rate,
+            "Blue",
+            "Red",
+            "Contrast"
+        ))
+
+    table <-
+        table  %>%
+        group_by(rate) %>%
+        median_hdci(.value)
+
+    return(table)
+}
+
+recover_covariates <- function(
+    draws,
+    data,
+    by,
+    ...
+) {
+    data <-
+        data %>%
+        mutate("{by}" := row_number()) %>%
+        select(.data[[by]], ...)
+
+    draws <-
+        draws %>%
+        left_join(data, by = by)
+
+    return(draws)
+}
+
 cumulative_predict <- function(
     one_step_predict_function,
     data,
@@ -170,9 +217,6 @@ plot_model_predictions <- function(
         rename(Team = team) %>%
         ggplot(aes(x = score)) +
         geom_step(aes(y = .predicted), size = 4, alpha = 0.5) +
-        #geom_ribbon(aes(ymin = .lower, ymax = .upper), alpha = 0.25) +
-        #geom_line(aes(y = .lower), alpha = 0.5) +
-        #geom_line(aes(y = .upper), alpha = 0.5) +
         geom_point(aes(y = time)) +
         facet_grid(cols = vars(Team), labeller = label_both) +
         scale_x_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
@@ -229,7 +273,7 @@ calculate_model_mae <- function(
         return()
 }
 
-calculate_model_prediction_coverage <- function(
+calculate_model_coverage <- function(
     predictions,
     threshold = 0 # in seconds
 ) {
@@ -247,85 +291,4 @@ calculate_model_interval_median_size <- function(
         summarise(median_size = median(.size, na.rm = TRUE)) %>%
         pull(median_size) %>%
         return()
-}
-
-table_model_rate <- function(
-    model_fit
-) {
-    table <-
-        model_fit %>%
-        gather_draws(rate[team], rate_contrast) %>%
-        ungroup() %>%
-        mutate(rate = case_when(
-            .variable == "rate_contrast" ~ "Contrast",
-            TRUE ~ as.character(team)
-        ))
-
-    table <-
-        table %>%
-        mutate(rate = fct_relevel(
-            rate,
-            "Blue",
-            "Red",
-            "Contrast"
-        ))
-
-    table <-
-        table  %>%
-        group_by(rate) %>%
-        median_hdci(.value)
-
-    return(table)
-}
-
-plot_model_score <- function(
-    model_fit,
-    data
-) {
-    draws <-
-        model_fit %>%
-        spread_draws(predicted_time[t], predicted_score[t]) %>%
-        sample_draws(POSTERIOR_PLOT_SAMPLE_COUNT) %>%
-        ungroup() %>%
-        recover_covariates(data, by = "t", team)
-
-    plot <-
-        draws %>%
-        ggplot(aes(
-            x = predicted_time,
-            y = predicted_score,
-            color = team,
-            group = str_c(.draw, team)
-        )) +
-        geom_step(alpha = ALPHA) +
-        geom_step(aes(x = time, y = score, color = team, group = NULL), data = data, size = 2) +
-        scale_x_continuous(limits = c(GAME_MIN_TIME, GAME_MAX_TIME)) +
-        scale_y_continuous(limits = c(GAME_MIN_SCORE, GAME_MAX_SCORE)) +
-        scale_color_viridis_d() +
-        theme_minimal(FONT_SIZE) +
-        labs(
-            x = "Time (minutes)",
-            y = "Score",
-            color = "Team"
-        )
-
-    return(plot)
-}
-
-recover_covariates <- function(
-    draws,
-    data,
-    by,
-    ...
-) {
-    data <-
-        data %>%
-        mutate("{by}" := row_number()) %>%
-        select(.data[[by]], ...)
-
-    draws <-
-        draws %>%
-        left_join(data, by = by)
-
-    return(draws)
 }

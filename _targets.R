@@ -44,7 +44,7 @@ train_data_targets <- list(
             if (is_raw_train_data_valid) {
                 train_data <- clean_data(raw_train_data)
             } else {
-                stop("Train data not valid. Check `is_raw_train_data_valid` target")
+                stop("Train data is not valid. Check `is_raw_train_data_valid` target")
             }
 
             train_data
@@ -54,24 +54,24 @@ train_data_targets <- list(
 
 exploratory_analysis_targets <- list(
     tar_target(
-        observed_score_plot,
+        train_observed_score_plot,
         plot_observed_score(train_data)
     ),
     tar_target(
-        observed_tbp_vs_score_plot,
+        train_observed_tbp_vs_score_plot,
         plot_observed_tbp_vs_score(train_data)
     ),
     tar_target(
-        observed_tbp_plot,
+        train_observed_tbp_plot,
         plot_observed_tbp(train_data)
     ),
     tar_target(
-        observed_tbp_vs_lag_tbp_plot,
+        train_observed_tbp_vs_lag_tbp_plot,
         plot_observed_tbp_vs_lag_tbp(train_data)
     ),
     tar_target(
-        window_mean_tbp_plot,
-        plot_observed_window_mean_tbp(train_data, window_size = WINDOW_SIZE)
+        train_observed_window_tbp_plot,
+        plot_observed_window_tbp(train_data, window_size = WINDOW_SIZE)
     )
 )
 
@@ -117,7 +117,7 @@ test_data_targets <- list(
             if (is_raw_test_data_valid) {
                 test_data <- clean_data(raw_test_data)
             } else {
-                stop("test data not valid. Check `is_raw_test_data_valid` target")
+                stop("Test data is not valid. Check `is_raw_test_data_valid` target")
             }
 
             test_data
@@ -127,7 +127,7 @@ test_data_targets <- list(
 
 test_model_targets <- list(
     tar_target(
-        test_score_plot,
+        test_observed_score_plot,
         plot_observed_score(test_data)
     ),
     tar_file(
@@ -146,6 +146,10 @@ test_model_targets <- list(
         test_model_fit,
         fit_model(test_model, test_model_data, test_data)
     ),
+    tar_target(
+        test_model_rate_table,
+        table_model_rate(test_model_fit)
+    ),
     tar_file(
         test_prediction_model_path,
         PREDICTION_MODEL_PATH
@@ -163,8 +167,8 @@ test_model_targets <- list(
         calculate_model_mae(test_model_predictions)
     ),
     tar_target(
-        test_model_prediction_coverage,
-        calculate_model_prediction_coverage(test_model_predictions, threshold = THRESHOLD)
+        test_model_coverage,
+        calculate_model_coverage(test_model_predictions, threshold = THRESHOLD)
     ),
     tar_target(
         test_model_interval_median_size,
@@ -177,10 +181,6 @@ test_model_targets <- list(
     tar_target(
         test_model_residue_plot,
         plot_model_residues(test_model_predictions)
-    ),
-    tar_target(
-        test_model_rate_table,
-        table_model_rate(test_model_fit)
     )
 )
 
@@ -197,8 +197,8 @@ sad_truth_targets <- list(
         calculate_model_mae(test_base_predictions)
     ),
     tar_target(
-        test_base_prediction_coverage,
-        calculate_model_prediction_coverage(test_base_predictions)
+        test_base_coverage,
+        calculate_model_coverage(test_base_predictions)
     ),
     tar_target(
         test_base_interval_median_size,

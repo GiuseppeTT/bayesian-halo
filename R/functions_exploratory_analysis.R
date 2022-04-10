@@ -78,7 +78,7 @@ plot_observed_tbp_vs_lag_tbp <- function(
     return(plot)
 }
 
-plot_observed_window_mean_tbp <- function(
+plot_observed_window_tbp <- function(
     data,
     window_size  # In seconds
 ) {

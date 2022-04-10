@@ -74,7 +74,7 @@ In the exploratory analysis, I demonstrate how the following properties about th
 We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the train dataset. It shows the score progression for both teams. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear, which suggests that the teams earn points at a constant rate.
 
 ```{r train-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the train dataset."}
-tar_read(observed_score_plot)
+tar_read(train_observed_score_plot)
 ```
 
 To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen from the regression curves, the average TBP is constant throughout the game.
@@ -84,25 +84,25 @@ Perhaps the only exception is the first score point which took roughly 30 second
 -->
 
 ```{r train-observed-tbp-vs-score-plot, fig.cap = "TBP for each team as a function of score. As observed in the train dataset."}
-tar_read(observed_tbp_vs_score_plot)
+tar_read(train_observed_tbp_vs_score_plot)
 ```
 
 Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) plots the estimated TBP distribution for each team. The density curves have an exponential decay which favors an exponential distribution.
 
 ```{r train-observed-tbp-plot, fig.cap = "Estimated TBP distribution for each team. As observed in the train dataset."}
-tar_read(observed_tbp_plot)
+tar_read(train_observed_tbp_plot)
 ```
 
 To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is no dependence between points within each team.
 
 ```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "TBP for each team as a function of previous TBP. As observed in the train dataset."}
-tar_read(observed_tbp_vs_lag_tbp_plot)
+tar_read(train_observed_tbp_vs_lag_tbp_plot)
 ```
 
 Finally, we take a look at the correlation between teams. Figure \@ref(fig:train-observed-window-mean-tbp) exhibits team blue's TBP as a function of team red's TBP, averaged over periods of `r WINDOW_SIZE` seconds. The horizontal regression curve indicates that team red has no influence on team blue and vice versa.
 
 ```{r train-observed-window-mean-tbp, fig.cap = str_glue("Team blue's TBP as a function of team red's TBP, averaged over periods of {WINDOW_SIZE} seconds. As observed in the train dataset.")}
-tar_read(window_mean_tbp_plot)
+tar_read(train_observed_window_tbp_plot)
 ```
 
 # Model
@@ -169,7 +169,7 @@ tar_read(prior_model_score_plot)
 To avoid overfitting, we now turn to the test dataset to check the model's performance. Figure \@ref(fig:train-observed-score-plot) shows the score progression for both teams as observed in the test dataset. Notice that the test dataset is a close match and is very different from the train dataset.
 
 ```{r test-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the test dataset."}
-tar_read(test_score_plot)
+tar_read(test_observed_score_plot)
 ```
 
 The model attained a good performance in the test dataset and Figure \@ref(fig:test-model-prediction-plot) makes it very clear. It shows the observed (black dot) and predicted (grey line) time for each score point. The fact that it is difficult to distinguish one from the other is a good sign.
@@ -180,7 +180,7 @@ tar_read(test_model_prediction_plot)
 
 Figure \@ref(fig:test-model-residue-plot) allows us to zoom in into the model errors. It plots the error (black line) made for each score point. The errors are quite small, with a median size of `r scales::number(60 * tar_read(test_model_mae), accuracy = 10^(-DECIMALS))` seconds.
 
-Figure \@ref(fig:test-model-residue-plot) also shows shaded regions. They should contain most of the error line and represent how wrong the model thinks it can be. Since the regions cover `r scales::percent(tar_read(test_model_prediction_coverage), accuracy = 10^(-DECIMALS))` of the errors and are narrow (median size of `r scales::number(60 * tar_read(test_model_interval_median_size), accuracy = 10^(-DECIMALS))` seconds), the model confidence is on point.
+Figure \@ref(fig:test-model-residue-plot) also shows shaded regions. They should contain most of the error line and represent how wrong the model thinks it can be. Since the regions cover `r scales::percent(tar_read(test_model_coverage), accuracy = 10^(-DECIMALS))` of the errors and are narrow (median size of `r scales::number(60 * tar_read(test_model_interval_median_size), accuracy = 10^(-DECIMALS))` seconds), the model confidence is on point.
 
 ```{r test-model-residue-plot, fig.cap = "Error (black line) made for each score point. Shaded regions should contain at least 95% of the errors. As observed in the test dataset."}
 tar_read(test_model_residue_plot)
@@ -215,7 +215,7 @@ TODO.
 
 ## A sad truth
 
-TODO. Talk about cumulative average model. Almost as good as the bayesian model and more simple. Non null probability for time travel. Median error size of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds. Coverage of `r scales::percent(tar_read(test_base_prediction_coverage), accuracy = 10^(-DECIMALS))`. Median interval size of `r scales::number(60 * tar_read(test_base_interval_median_size), accuracy = 10^(-DECIMALS))` seconds.
+TODO. Talk about cumulative average model. Almost as good as the bayesian model and more simple. Non null probability for time travel. Median error size of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds. Coverage of `r scales::percent(tar_read(test_base_coverage), accuracy = 10^(-DECIMALS))`. Median interval size of `r scales::number(60 * tar_read(test_base_interval_median_size), accuracy = 10^(-DECIMALS))` seconds.
 
 ```{r test-base-prediction-plot, fig.cap = "Observed (black dot) and predicted (blue line) time for each score point. As observed in the test dataset with the cumulative average model."}
 tar_read(test_base_prediction_plot)
