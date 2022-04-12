@@ -10,6 +10,8 @@ source(here::here("R/functions_data.R"))
 source(here::here("R/functions_prior.R"))
 source(here::here("R/functions_exploratory_analysis.R"))
 source(here::here("R/functions_model.R"))
+source(here::here("R/functions_predictive_model.R"))
+source(here::here("R/functions_winning_probability_model.R"))
 
 ################################################################################
 # Set R options
@@ -181,6 +183,14 @@ test_model_targets <- list(
     tar_target(
         test_model_residue_plot,
         plot_model_residues(test_model_predictions)
+    ),
+    tar_target(
+        test_model_winning_probabilities,
+        cumulative_winning_probability(test_data)
+    ),
+    tar_target(
+        test_model_winning_probabilities_plot,
+        plot_winning_probabilities(test_model_winning_probabilities)
     )
 )
 

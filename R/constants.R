@@ -7,6 +7,7 @@ STAN_OUTPUT_PATH <- here::here("output/stan/")
 PRIOR_MODEL_PATH <- here::here("stan/prior_model.stan")
 MODEL_PATH <- here::here("stan/model.stan")
 PREDICTION_MODEL_PATH <- here::here("stan/prediction_model.stan")
+WINNING_PROBABILITY_MODEL_PATH <- here::here("stan/winning_probability_model.stan")
 
 REPORT_SOURCE_PATH <- here::here("Rmd/report.Rmd")
 REPORT_OUTPUT_PATH <- here::here("output/github-pages/report.html")
