@@ -31,19 +31,19 @@ source("R/constants.R")
 
 **Introduction:** I used bayesian stats to model a match of [Halo Infinite](https://www.xbox.com/games/halo-infinite). The game consists of 2 teams of 12 players that must score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
 
-**Model and results:** The model obtained a median error size of `r scales::number(60 * tar_read(test_model_mae), accuracy = 10^(-DECIMALS))` seconds when predicting when the next point will be scored. Moreover, it provided powerful insights such as estimates for the teams performance and the probability of a team winning at any given time.
+**Results:** The model obtained a median absolute error of `r scales::number(60 * tar_read(test_model_mae), accuracy = 10^(-DECIMALS))` seconds in predicting when each team will score its next point. Moreover, it provided powerful insights such as estimates for the teams' performance and the probability of a team winning at any given time.
 
-**Conclusion:** The model was little better than a simple cumulative average (median error size of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds). Therefore, the bayesian model is well suited for a high accurate analysis, but fails to justify its computational demand and math complexity for more sensible applications.
+**Conclusion:** The model was little better than a cumulative average (median absolute error of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds). Therefore, the bayesian model is well suited for a highly accurate analysis, but fails to justify its complexity and computational demand for simpler applications.
 
 # Introduction
 
 If you are like me, you have been playing [Halo Infinite](https://www.xbox.com/games/halo-infinite) a lot in the past weeks. One game mode that I enjoy is Big Team Battle Slayer (BTBS) in which 2 teams of 12 players must score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
 
-Now, if you are really like me, you have also been wondering about how to use statistics to calculate the chance of winning. Intuitively, I know that if the score is 20 - 10 for my team I have a slight advantage, whereas 90 - 80 is a certain win. But how can I quantify this probability? This is the question that my work sets out to answer using bayesian statistics.
+Now, if you are really like me, you have also been wondering about how to calculate the chance of winning. Intuitively, I know that if the score is 20 - 10 for my team I have a slight advantage, whereas 90 - 80 is a certain win. But how can I quantify this probability? This is the question that my work sets out to answer using bayesian statistics.
 
 # Dataset
 
-To answer the proposed question, I selected two matches of Halo BTBS from YouTube and annotated the game statistics. The [first game](https://youtu.be/cANMWiYTD84) defines the train dataset. It was used to gain quantitative knowledge about this type of data, propose a model and check valid values for a prior distribution. The [second game](https://youtu.be/kuH9nhdzt64) defines the test dataset. It was used to fit the proposed model in a new dataset to check the model's performance.
+To answer the proposed question, I selected two matches of Halo BTBS from YouTube and annotated the game statistics. The [first game](https://youtu.be/cANMWiYTD84) defines the train dataset. It was used to better understand this type of data and propose a model. The [second game](https://youtu.be/kuH9nhdzt64) defines the test dataset. It was used to fit the proposed model in a new dataset and check the model's performance.
 
 Each dataset is composed of three variables (columns):
 
@@ -74,7 +74,7 @@ In the exploratory analysis, I demonstrate how the following properties about th
 We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the train dataset. It shows the score progression for both teams. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear, which suggests that the teams earn points at a constant rate.
 
 ```{r train-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the train dataset."}
-tar_read(observed_score_plot)
+tar_read(train_observed_score_plot)
 ```
 
 To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tbp-vs-score-plot). It shows the time between points (TBP) for each team as a function of score. As it can be seen from the regression curves, the average TBP is constant throughout the game.
@@ -84,25 +84,25 @@ Perhaps the only exception is the first score point which took roughly 30 second
 -->
 
 ```{r train-observed-tbp-vs-score-plot, fig.cap = "TBP for each team as a function of score. As observed in the train dataset."}
-tar_read(observed_tbp_vs_score_plot)
+tar_read(train_observed_tbp_vs_score_plot)
 ```
 
 Still about the time between points, Figure \@ref(fig:train-observed-tbp-plot) plots the estimated TBP distribution for each team. The density curves have an exponential decay which favors an exponential distribution.
 
 ```{r train-observed-tbp-plot, fig.cap = "Estimated TBP distribution for each team. As observed in the train dataset."}
-tar_read(observed_tbp_plot)
+tar_read(train_observed_tbp_plot)
 ```
 
 To evaluate the independence between points, Figure \@ref(fig:train-observed-tbp-vs-lag-tbp-plot) shows TBP vs previous TBP for each team. Taking into account the estimation error, the regression curves are reasonably constant. This means that there is no dependence between points within each team.
 
 ```{r train-observed-tbp-vs-lag-tbp-plot, fig.cap = "TBP for each team as a function of previous TBP. As observed in the train dataset."}
-tar_read(observed_tbp_vs_lag_tbp_plot)
+tar_read(train_observed_tbp_vs_lag_tbp_plot)
 ```
 
 Finally, we take a look at the correlation between teams. Figure \@ref(fig:train-observed-window-mean-tbp) exhibits team blue's TBP as a function of team red's TBP, averaged over periods of `r WINDOW_SIZE` seconds. The horizontal regression curve indicates that team red has no influence on team blue and vice versa.
 
 ```{r train-observed-window-mean-tbp, fig.cap = str_glue("Team blue's TBP as a function of team red's TBP, averaged over periods of {WINDOW_SIZE} seconds. As observed in the train dataset.")}
-tar_read(window_mean_tbp_plot)
+tar_read(train_observed_window_tbp_plot)
 ```
 
 # Model
@@ -144,7 +144,7 @@ blue_point_rate ~ Exponential(rate_of_rates)
 red_point_rate ~ Exponential(rate_of_rates)
 ```
 
-Lastly, part 3 states that TBP follows an exponential distribution with the specified point rates. More importantly, each point is assumed to be independent from the others.
+Lastly, part 3 states that TBP follows an exponential distribution with the specified point rates. Moreover, each point is assumed to be independent from the others.
 
 ```R
 # Part 3: Likelihood
@@ -166,13 +166,13 @@ tar_read(prior_model_score_plot)
 
 ## Model performance
 
-To avoid overfitting, we now turn to the test dataset to check the model's performance. Figure \@ref(fig:train-observed-score-plot) shows the score progression for both teams as observed in the test dataset. Notice that the test dataset is a close match and is very different from the train dataset.
+To avoid overfitting, we now turn to the test dataset to check the model's performance. Figure \@ref(fig:test-observed-score-plot) shows the score progression for both teams as observed in the test dataset. Notice that the test dataset is a close match and is very different from the train dataset.
 
 ```{r test-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the test dataset."}
-tar_read(test_score_plot)
+tar_read(test_observed_score_plot)
 ```
 
-The model attained a good performance in the test dataset and Figure \@ref(fig:test-model-prediction-plot) makes it very clear. It shows the observed (black dot) and predicted (grey line) time for each score point. The fact that it is difficult to distinguish one from the other is a good sign.
+The model attained a good performance in the test dataset and Figure \@ref(fig:test-model-prediction-plot) makes it very clear. It shows the observed (black dot) and predicted (gray line) time for each score point. The fact that it is difficult to distinguish one from the other is a good sign.
 
 ```{r test-model-prediction-plot, fig.cap = "Observed (black dot) and predicted (blue line) time for each score point. As observed in the test dataset."}
 tar_read(test_model_prediction_plot)
@@ -180,15 +180,15 @@ tar_read(test_model_prediction_plot)
 
 Figure \@ref(fig:test-model-residue-plot) allows us to zoom in into the model errors. It plots the error (black line) made for each score point. The errors are quite small, with a median size of `r scales::number(60 * tar_read(test_model_mae), accuracy = 10^(-DECIMALS))` seconds.
 
-Figure \@ref(fig:test-model-residue-plot) also shows shaded regions. They should contain most of the error line and represent how wrong the model thinks it can be. Since the regions cover `r scales::percent(tar_read(test_model_prediction_coverage), accuracy = 10^(-DECIMALS))` of the errors and are narrow (median size of `r scales::number(60 * tar_read(test_model_interval_median_size), accuracy = 10^(-DECIMALS))` seconds), the model confidence is on point.
+Figure \@ref(fig:test-model-residue-plot) also shows shaded regions. They should contain most of the error line and represent how wrong the model thinks it can be. Since the regions cover `r scales::percent(tar_read(test_model_coverage), accuracy = 10^(-DECIMALS))` of the errors and are narrow (median size of `r scales::number(60 * tar_read(test_model_interval_median_size), accuracy = 10^(-DECIMALS))` seconds), the model confidence is on point.
 
-```{r test-model-residue-plot, fig.cap = "Error (black line) made for each score point. Shaded regions should contain at least 95% of the errors. As observed in the test dataset."}
+```{r test-model-residue-plot, fig.cap = "Error (black line) made for each score point. Shaded regions should contain most of the error line and represent how wrong the model thinks it can be. As observed in the test dataset."}
 tar_read(test_model_residue_plot)
 ```
 
-## Model inference
+## Inference
 
-Now that we know the that model is well fit, we can turn to it for answers on how good the teams are. Table \@ref(tab:test-model-rate-table) summarizes the point rates. Despite team red winning (estimated point rate of `r tar_read(test_model_rate_table) %>% filter(rate == "Red") %>% pull(.value) %>% scales::number(accuracy = 10^(-DECIMALS))` points per minute), the difference between point rates (contrast) is not significant. This means that for all purpose and intent, both teams are equally good.
+Now that we know that the model is well fit, we can turn to it for answers on how good the teams are. Table \@ref(tab:test-model-rate-table) summarizes the point rates. Despite team red winning (estimated point rate of `r tar_read(test_model_rate_table) %>% filter(rate == "Red") %>% pull(.value) %>% scales::number(accuracy = 10^(-DECIMALS))` points per minute), the difference between point rates (contrast) is not significant. This means that for all purpose and intent, both teams are equally good.
 
 ```{r test-model-rate-table}
 tar_read(test_model_rate_table) %>%
@@ -211,15 +211,23 @@ tar_read(test_model_rate_table) %>%
 
 ## Probability of winning
 
-TODO.
+Finally, Figure \@ref(fig:test-model-winning-probabilities-plot) displays team blue's probability of winning (black line) as predicted by the model. It suggests an advantage for team blue during most of the game. This agrees with Figure \@ref(fig:test-observed-score-plot) in which team blue has more points for most of the game.
 
-## A sad truth
+Again, the shaded region summarizes other possible probabilities and represents how wrong the model thinks it can be. An interesting part is the beginning of the match when team blue had 2.5 times the number of points of team red. As per the model, team blue should have won with a great confidence, but team red was able to turn the game and win at the last minute.
 
-TODO. Talk about cumulative average model. Almost as good as the bayesian model and more simple. Non null probability for time travel. Median error size of `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds. Coverage of `r scales::percent(tar_read(test_base_prediction_coverage), accuracy = 10^(-DECIMALS))`. Median interval size of `r scales::number(60 * tar_read(test_base_interval_median_size), accuracy = 10^(-DECIMALS))` seconds.
+```{r test-model-winning-probabilities-plot, fig.cap = "Team blue's probability of winning (black line) as predicted by the model for each time point. Shaded region summarizes other possible probabilities and represents how wrong the model thinks it can be. As observed in the test dataset."}
+tar_read(test_model_winning_probabilities_plot)
+```
+
+## Baseline comparison
+
+For the last remark, we need to compare how the model performs compared to a baseline. Figure \@ref(fig:test-base-prediction-plot) summarizes the predictions made by a cumulative average. That is, the next point for team blue is predicted to happen at `current_time` `+` `blue_average_tbp`. Just like for the bayesian model, it is difficult to distinguish the predictions from the observed data.
 
 ```{r test-base-prediction-plot, fig.cap = "Observed (black dot) and predicted (blue line) time for each score point. As observed in the test dataset with the cumulative average model."}
 tar_read(test_base_prediction_plot)
 ```
+
+Figure \@ref(fig:test-base-residue-plot) plots the error made for each score point. The median absolute error is `r scales::number(60 * tar_read(test_base_mae), accuracy = 10^(-DECIMALS))` seconds and the intervals have a median size of `r scales::number(60 * tar_read(test_base_interval_median_size), accuracy = 10^(-DECIMALS))` seconds (coverage = `r scales::percent(tar_read(test_base_coverage), accuracy = 10^(-DECIMALS))`). In summary, the bayesian model obtained results about 20% better than the baseline.
 
 ```{r test-base-residue-plot, fig.cap = "Error (black line) made for each score point. Shaded regions should contain at least 95% of the errors. As observed in the test dataset with the cumulative average model."}
 tar_read(test_base_residue_plot)
@@ -227,4 +235,4 @@ tar_read(test_base_residue_plot)
 
 # Conclusion
 
-The model was little better than a simple cumulative average. Therefore, the bayesian model is well suited for a high accurate analysis, but fails to justify its computational demand and math complexity for more sensible applications.
+The model showed a good fit and was able to provide powerful insights such as the probability of team blue winning at any time point. That being said, the performance was little better than a cumulative average. Therefore, the bayesian model is well suited for a highly accurate analysis, but fails to justify its complexity and computational demand for simpler applications.

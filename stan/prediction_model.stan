@@ -7,18 +7,21 @@ data {
 }
 transformed data {
     real<lower = 0> rate_of_rates;
-    array[team_count] real<lower = 0> last_time;
-    array[sample_size] real tbp;
 
     rate_of_rates = 1 / mean_rate_of_rates;
 
-    for (i in 1:team_count) {
-        last_time[i] = 0;
-    }
+    array[sample_size] real tbp;
 
-    for (i in 2:sample_size) {
-        tbp[i] = time[i] - last_time[team[i]];
-        last_time[team[i]] = time[i];
+    {
+        array[team_count] real last_time;
+        for (i in 1:team_count) {
+            last_time[i] = 0;
+        }
+
+        for (i in 2:sample_size) {
+            tbp[i] = time[i] - last_time[team[i]];
+            last_time[team[i]] = time[i];
+        }
     }
 }
 parameters {
