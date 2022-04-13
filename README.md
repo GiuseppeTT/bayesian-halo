@@ -1,7 +1,14 @@
 # Bayesian Halo
 
 ## Description
-TODO.
+This repository holds the source code for my analysis of two [Halo Infinite](https://www.xbox.com/games/halo-infinite) matches. You can access the final report here: https://giuseppett.github.io/bayesian-halo/report.html
+
+## Analysis abstract
+**Introduction:** I used bayesian stats to model a match of [Halo Infinite](https://www.xbox.com/games/halo-infinite). The game consists of 2 teams of 12 players that must score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
+
+**Results:** The model obtained a median absolute error of 2.6 seconds in predicting when each team will score its next point. Moreover, it provided powerful insights such as estimates for the teams’ performance and the probability of a team winning at any given time.
+
+**Conclusion:** The model was little better than a cumulative average (median absolute error of 3.4 seconds). Therefore, the bayesian model is well suited for a highly accurate analysis, but fails to justify its complexity and computational demand for simpler applications.
 
 ## How to use
 ### ... On VSCode
