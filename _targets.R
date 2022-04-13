@@ -194,7 +194,7 @@ test_model_targets <- list(
     )
 )
 
-sad_truth_targets <- list(
+baseline_targets <- list(
     tar_target(
         test_base_predictions,
         cumulative_predict(
@@ -238,7 +238,7 @@ targets <- c(
     prior_targets,
     test_data_targets,
     test_model_targets,
-    sad_truth_targets,
+    baseline_targets,
     report_targets
 )
 
