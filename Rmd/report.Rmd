@@ -7,7 +7,6 @@ output:
     distill::distill_article:
         toc: true
 repository_url: https://github.com/GiuseppeTT/bayesian-halo
-preview: images/preview.png
 ---
 
 ```{r setup, include = FALSE}
@@ -84,7 +83,7 @@ To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tb
 Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield at the start of the game.
 -->
 
-```{r train-observed-tbp-vs-score-plot, fig.cap = "TBP for each team as a function of score. As observed in the train dataset."}
+```{r train-observed-tbp-vs-score-plot, fig.cap = "TBP for each team as a function of score. As observed in the train dataset.", preview = TRUE}
 tar_read(train_observed_tbp_vs_score_plot)
 ```
 
