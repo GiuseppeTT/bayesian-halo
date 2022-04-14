@@ -225,6 +225,14 @@ baseline_targets <- list(
 )
 
 report_targets <- list(
+    tar_file(
+        preview_image,
+        command = {
+            ggsave(REPORT_PREVIEW_IMAGE_PATH, train_observed_score_plot)
+
+            REPORT_PREVIEW_IMAGE_PATH
+        }
+    ),
     tar_render(
         report,
         REPORT_SOURCE_PATH,

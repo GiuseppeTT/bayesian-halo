@@ -11,6 +11,7 @@ WINNING_PROBABILITY_MODEL_PATH <- here::here("stan/winning_probability_model.sta
 
 REPORT_SOURCE_PATH <- here::here("Rmd/report.Rmd")
 REPORT_OUTPUT_PATH <- here::here("output/github-pages/report.html")
+REPORT_PREVIEW_IMAGE_PATH <- here::here("output/github-pages/images/preview.png")
 
 NETWORK_PATH <- here::here("output/github-pages/targets.html")
 
