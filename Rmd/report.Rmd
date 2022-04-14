@@ -8,6 +8,7 @@ output:
         toc: true
         self_contained: false
 repository_url: https://github.com/GiuseppeTT/bayesian-halo
+base_url: https://giuseppett.github.io/bayesian-halo
 ---
 
 ```{r setup, include = FALSE}
@@ -74,7 +75,7 @@ In the exploratory analysis, I demonstrate how the following properties about th
 
 We begin the analysis with Figure \@ref(fig:train-observed-score-plot) which summarizes the train dataset. It shows the score progression for both teams. Besides the clear win for team blue, a pattern stands out. The score trajectories are linear, which suggests that the teams earn points at a constant rate.
 
-```{r train-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the train dataset."}
+```{r train-observed-score-plot, fig.cap = "Score progression for both teams. As observed in the train dataset.", preview = TRUE}
 tar_read(train_observed_score_plot)
 ```
 
@@ -84,7 +85,7 @@ To better explore the point rate, we refer to Figure \@ref(fig:train-observed-tb
 Perhaps the only exception is the first score point which took roughly 30 seconds for both teams. This is due to the fact that the players start at their bases and must walk to the middle of the battlefield at the start of the game.
 -->
 
-```{r train-observed-tbp-vs-score-plot, fig.cap = "TBP for each team as a function of score. As observed in the train dataset.", preview = TRUE}
+```{r train-observed-tbp-vs-score-plot, fig.cap = "TBP for each team as a function of score. As observed in the train dataset."}
 tar_read(train_observed_tbp_vs_score_plot)
 ```
 
