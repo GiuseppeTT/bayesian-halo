@@ -6,6 +6,7 @@ author: Giuseppe Tinti Tomio
 output:
     distill::distill_article:
         toc: true
+        self_contained: false
 repository_url: https://github.com/GiuseppeTT/bayesian-halo
 ---
 
