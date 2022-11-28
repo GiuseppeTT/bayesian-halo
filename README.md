@@ -1,7 +1,7 @@
 # Bayesian Halo
 
 ## Description
-This repository holds the source code for my analysis of two [Halo Infinite](https://www.xbox.com/games/halo-infinite) matches. You can access the final report here: https://giuseppett.github.io/bayesian-halo/report.html
+This repository holds the source code for my analysis of two [Halo Infinite](https://www.xbox.com/games/halo-infinite) matches. You can access the final report here: https://giuseppett.github.io/bayesian-halo/
 
 ## Analysis abstract
 **Introduction:** I used bayesian stats to model a match of [Halo Infinite](https://www.xbox.com/games/halo-infinite). The game consists of 2 teams of 12 players that must score points by defeating players of the other team. A team wins if it is the first to achieve 100 points or has the biggest score by the 15 minutes mark.
@@ -20,7 +20,7 @@ You can run the project inside a development container by following these steps 
 - Open a new terminal (press `` ctrl+shift+` ``) and execute the command `Rscript scripts/set_up.R`
 - Open a new terminal (press `` ctrl+shift+` ``) and execute the command `Rscript scripts/make.R`
 
-After that, the report will be available at `output/github-pages/report.html`.
+After that, the report will be available at `output/github-pages/index.html`.
 
 Notes: you may need to install [docker](https://www.docker.com/).
 
